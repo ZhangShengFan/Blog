@@ -41,6 +41,78 @@ const isEditableTarget = (target: EventTarget | null) => {
 
 
 
+const getVisitorInfo = () => {
+  if (typeof window === 'undefined') return [];
+  const ua = navigator.userAgent;
+  const platform = navigator.platform || '';
+  const language = navigator.language || '';
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  const resolution = `${window.screen.width} × ${window.screen.height}`;
+  const theme = document.documentElement.classList.contains('dark') ? '深色' : '浅色';
+  const touch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? '是' : '否';
+
+  const browser = /Chrome\//.test(ua) && !/Edg\//.test(ua) ? 'Chrome' : /Edg\//.test(ua) ? 'Edge' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) && !/Chrome\//.test(ua) ? 'Safari' : '未知';
+  const os = /Windows NT/.test(ua) ? 'Windows' : /Mac OS X/.test(ua) ? 'macOS' : /Android/.test(ua) ? 'Android' : /iPhone|iPad|iPod/.test(ua) ? 'iOS' : /Linux/.test(ua) ? 'Linux' : '未知';
+  const device = /Mobi|Android|iPhone|iPad|iPod/.test(ua) ? '移动设备' : '桌面设备';
+
+  return [
+    { label: '浏览器', value: browser },
+    { label: '操作系统', value: os },
+    { label: '设备类型', value: device },
+    { label: '平台', value: platform },
+    { label: '语言', value: language },
+    { label: '时区', value: timezone },
+    { label: '分辨率', value: resolution },
+    { label: '主题', value: theme },
+    { label: '触屏', value: touch },
+  ];
+};
+
+const VisitorInfoPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
+  const info = getVisitorInfo();
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[90] flex items-end justify-center bg-black/30 px-4 pb-4 pt-20 backdrop-blur-sm md:items-center md:pb-0"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: 24, opacity: 0, scale: 0.98 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 18, opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: easeSmooth }}
+            className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500 dark:text-zinc-400">{TEXT.visitorInfo}</div>
+                <h3 className="mt-2 text-lg font-bold text-zinc-900 dark:text-zinc-100">{TEXT.visitorInfoDesc}</h3>
+              </div>
+              <button className="rounded-full border border-zinc-200 p-2 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800" onClick={onClose} aria-label="关闭">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-2 text-sm">
+              {info.map((item) => (
+                <div key={item.label} className="flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2 dark:bg-zinc-800/60">
+                  <span className="text-zinc-500 dark:text-zinc-400">{item.label}</span>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100">{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-xs leading-5 text-zinc-500 dark:text-zinc-400">仅展示本地可读取的浏览器环境信息，不包含敏感隐私数据。</p>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const ThemeToggle = () => {
   type Theme = 'light' | 'dark' | 'system';
   const hasInitializedThemeRef = useRef(false);
