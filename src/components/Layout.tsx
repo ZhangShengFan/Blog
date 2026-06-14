@@ -1051,6 +1051,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) =
       </main>
       <Suspense fallback={null}>
         <BackToTop />
+      <div className="fixed bottom-5 right-5 z-[85]">
+        <button
+          type="button"
+          onClick={() => setVisitorInfoOpen(true)}
+          className="see-my-info-btn rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-lg hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        >
+          See My Info
+        </button>
+      </div>
+      <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
       </Suspense>
       <Footer isPostPage={isPostPage} />
     </div>
