@@ -104,6 +104,8 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 .toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s}
 .toggle input:checked+.toggle-slider{background:var(--accent)}
 .toggle input:checked+.toggle-slider::before{transform:translateX(16px)}
+.meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.meta-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--muted)}
 .editor-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:4px}
 .btn-accent{background:var(--accent);color:#fff}
 .btn-accent:hover{background:var(--accent-hover)}
@@ -207,7 +209,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
         <button class="btn btn-sm btn-ghost" onclick="backToList()">← 返回</button>
         <h2 id="editor-title">新建文章</h2>
       </div>
-      <div class="editor-actions">
+      <div class="editor-actions"><button class="btn btn-ghost" id="uploadImageBtn" type="button">上传图片</button>
         <button class="btn btn-sm btn-ghost btn-danger" id="delete-btn" onclick="deletePost()" style="display:none">删除</button>
         <button class="btn btn-sm btn-ghost" type="button" onclick="previewPost()">预览文章</button>
         <button class="btn btn-sm btn-ghost" type="button" onclick="copyPostLink()">复制链接</button>
@@ -294,7 +296,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
         <button class="btn btn-sm btn-ghost" onclick="backToList()">← 返回</button>
         <h2 id="friend-editor-title">新建友链</h2>
       </div>
-      <div class="editor-actions">
+      <div class="editor-actions"><button class="btn btn-ghost" id="uploadImageBtn" type="button">上传图片</button>
         <button class="btn btn-sm btn-ghost btn-danger" id="friend-delete-btn" onclick="deleteFriend()" style="display:none">删除</button>
         <button class="btn btn-sm btn-ghost" onclick="backToList()">取消</button>
         <button class="btn btn-sm btn-accent" onclick="saveFriend()">保存到 GitHub</button>
@@ -1136,6 +1138,37 @@ function showToast(msg, type = '') {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.className = '', 3000);
 }
+</script>
+<input type="file" id="imageUploadInput" accept="image/*" hidden>
+
+<script>
+(function(){
+  const uploadBtn = document.getElementById('uploadImageBtn');
+  const fileInput = document.getElementById('imageUploadInput');
+  const featuredToggle = document.getElementById('featuredToggle');
+  const topInput = document.getElementById('topInput');
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      alert('图片上传功能的存储后端还未接好，先保留上传入口。');
+      fileInput.value = '';
+    });
+  }
+  if (featuredToggle) {
+    featuredToggle.addEventListener('change', () => {
+      const e = new CustomEvent('admin-featured-changed', { detail: featuredToggle.checked });
+      window.dispatchEvent(e);
+    });
+  }
+  if (topInput) {
+    topInput.addEventListener('change', () => {
+      const e = new CustomEvent('admin-top-changed', { detail: Number(topInput.value || 0) });
+      window.dispatchEvent(e);
+    });
+  }
+})();
 </script>
 </body>
 </html>
