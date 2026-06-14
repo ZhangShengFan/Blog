@@ -1170,5 +1170,37 @@ function showToast(msg, type = '') {
   }
 })();
 </script>
+
+<script>
+(function(){
+  const imageBtn = document.getElementById('uploadImageBtn');
+  const imageInput = document.getElementById('imageUploadInput');
+  if (imageBtn && imageInput) {
+    imageBtn.addEventListener('click', () => imageInput.click());
+    imageInput.addEventListener('change', async () => {
+      const file = imageInput.files && imageInput.files[0];
+      if (!file) return;
+      const form = new FormData();
+      form.append('file', file);
+      try {
+        const res = await fetch('/api/admin/upload-image', { method: 'POST', body: form });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || 'upload failed');
+        if (window.editor && data.url) {
+          const cm = window.editor.codemirror;
+          const pos = cm.getCursor();
+          cm.replaceRange(`![](${data.url})`, pos);
+        }
+        alert('图片上传成功');
+      } catch (e) {
+        console.error(e);
+        alert('图片上传失败：' + e.message);
+      } finally {
+        imageInput.value = '';
+      }
+    });
+  }
+})();
+</script>
 </body>
 </html>
