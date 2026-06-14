@@ -791,7 +791,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
   );
 };
 
-const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
+const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
 
   useEffect(() => {
@@ -946,7 +946,7 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
             </span>
             <button
               type="button"
-              onClick={() => setVisitorInfoOpen(true)}
+              onClick={onOpenVisitorInfo}
               className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
               See My Info
@@ -1059,7 +1059,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) =
       <Suspense fallback={null}>
         <BackToTop />
       </Suspense>
-      <Footer isPostPage={isPostPage} />
+      <Footer isPostPage={isPostPage} onOpenVisitorInfo={() => setVisitorInfoOpen(true)} />
       <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
     </div>
   );
