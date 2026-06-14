@@ -1,0 +1,7 @@
+# Cloudflare Pages 配置
+# 用于本地预览: npx wrangler pages dev dist
+name = "blog"
+compatibility_date = "2024-01-01"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
