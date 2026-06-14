@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sun, Moon, Github, Menu, X, Search, Mail, Heart, Zap, Coffee, Code2, Layers, GitBranch, Box, Monitor, Rss, Image, BookOpen, Archive, Tag, BarChart3, Users, Info } from 'lucide-react';
+import { Sun, Moon, Github, Menu, X, Search, Mail, Heart, Zap, Coffee, Code2, Layers, GitBranch, Box, Monitor, Rss, Image, BookOpen, Archive, Tag, BarChart3, Users, Info, Clock3 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { preloadPage } from '@/utils/preload';
 import { siteConfig } from '@config/site.config';
@@ -792,6 +792,36 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 
 const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
+  const [runtimeText, setRuntimeText] = useState<string>('');
+
+  useEffect(() => {
+    if (isPostPage) {
+      return;
+    }
+
+    const startedAt = new Date(`${siteConfig.runtimeStartDate}T00:00:00`);
+
+    const updateRuntime = () => {
+      const now = new Date();
+      const diff = now.getTime() - startedAt.getTime();
+
+      if (Number.isNaN(diff) || diff < 0) {
+        setRuntimeText('运行中');
+        return;
+      }
+
+      const totalMinutes = Math.floor(diff / (1000 * 60));
+      const days = Math.floor(totalMinutes / (60 * 24));
+      const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+      const minutes = totalMinutes % 60;
+      setRuntimeText(`${days}天 ${hours}小时 ${minutes}分钟`);
+    };
+
+    updateRuntime();
+    const timer = window.setInterval(updateRuntime, 60000);
+
+    return () => window.clearInterval(timer);
+  }, [isPostPage]);
 
   useEffect(() => {
     if (isPostPage) {
@@ -884,7 +914,13 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
                       </span>
                     </motion.div>
                   )}
-                  <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
+                  {runtimeText && (
+                    <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
+                      <Clock3 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                      <span>网站已运行 {runtimeText}</span>
+                    </motion.div>
+                  )}
+                  <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.05, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
                     <Coffee size={13} className="text-amber-700 dark:text-amber-600" />
                     <span>By ZSFan</span>
                   </motion.div>
