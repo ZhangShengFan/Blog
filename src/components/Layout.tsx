@@ -954,7 +954,6 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
           </div>
         </div>
       </motion.div>
-      <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
     </footer>
   );
 };
@@ -1061,6 +1060,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) =
         <BackToTop />
       </Suspense>
       <Footer isPostPage={isPostPage} />
+      <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
     </div>
   );
 };
