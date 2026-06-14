@@ -1,9 +1,8 @@
-name: Deploy to Cloudflare Pages
+name: Deploy Blog
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -11,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Build & Deploy
+  Build-And-Deploy:
+    name: Build → Pages
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,22 +21,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
       - name: Build
         run: npm run build
         env:
-          # 在仓库 Settings > Secrets 中配置 VITE_SITE_URL
           VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy To Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
