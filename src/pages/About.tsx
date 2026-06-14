@@ -9,7 +9,7 @@ export const About = () => {
     'Kotlin', 'Java', 'Android', 'JavaScript', 'TypeScript',
     'React', 'Node.js', 'Python', 'Bash / Shell',
     'Cloudflare Pages', 'Cloudflare Workers', 'GitHub Actions',
-    'Docker', 'Gradle', 'Vite',
+    'Docker', 'Gradle', 'Vite', 'Markdown', 'Tailwind CSS',
   ];
 
   return (
@@ -74,12 +74,16 @@ export const About = () => {
               我是 <strong className="text-zinc-900 dark:text-zinc-100">ZSFan</strong>，一名热爱折腾的全栈开发者，专注于 Android 开发与 Web 全栈方向。
             </p>
             <p>
+              我喜欢把技术问题写成可以反复查看的文章，尤其是那些真正踩过坑、解决过问题的内容。
             </p>
             <p>
-              这个博客用来记录我的技术探索、项目经验和生活随笔，内容真实、不拍脑袋，欢迎交流。
+              这个博客主要记录我的项目实践、开发经验、折腾过程和一些日常思考，内容尽量保持真实、克制、可读。
             </p>
             <p>
-              有任何想法或合作意向，欢迎通过 GitHub 或邮件联系我。
+              目前我更关注的是把站点做成一个稳定、轻量、可以长期维护的个人作品，而不是追求复杂的功能堆叠。
+            </p>
+            <p>
+              如果你也在做个人博客、静态站点或者 Cloudflare 相关实践，欢迎通过 GitHub 或邮件联系我。
             </p>
           </div>
         </div>
