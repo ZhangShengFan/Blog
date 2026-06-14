@@ -18,10 +18,10 @@ const AUTHOR_NAME = siteConfig.author.name;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const POSTS_DIR = path.join(__dirname, '../Posts');
+const POSTS_DIR = path.join(__dirname, '../posts');
 const FRIENDS_DIR = path.join(__dirname, '../friends');
 const OUTPUT_JSON_DIR = path.join(__dirname, '../generated');
-const PUBLIC_DIR = path.join(__dirname, '../Public');
+const PUBLIC_DIR = path.join(__dirname, '../public');
 
 if (!fs.existsSync(OUTPUT_JSON_DIR)) {
   fs.mkdirSync(OUTPUT_JSON_DIR, { recursive: true });
