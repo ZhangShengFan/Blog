@@ -7,6 +7,7 @@ export const siteConfig = {
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
+  runtimeStartDate: '2026-06-14',
   url: 'https://blog.zsfan8986.dpdns.org',
   social: {
     github: 'https://github.com/ZhangShengFan/',
