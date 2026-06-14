@@ -74,7 +74,6 @@ export const About = () => {
               我是 <strong className="text-zinc-900 dark:text-zinc-100">ZSFan</strong>，一名热爱折腾的全栈开发者，专注于 Android 开发与 Web 全栈方向。
             </p>
             <p>
-              日常喜欢用 <strong className="text-zinc-900 dark:text-zinc-100">Cloudflare</strong> 系列产品搭建各种工具和服务，享受从零构建到上线的完整过程。
             </p>
             <p>
               这个博客用来记录我的技术探索、项目经验和生活随笔，内容真实、不拍脑袋，欢迎交流。
