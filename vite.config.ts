@@ -122,6 +122,6 @@ export default defineConfig({
       },
     },
   },
-  publicDir: 'Public',
+  publicDir: 'public',
 });
 
