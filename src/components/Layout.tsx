@@ -947,16 +947,17 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
           </div>
         </div>
       </motion.div>
-    
-      <button
-        type="button"
-        onClick={() => setVisitorInfoOpen(true)}
-        className="mt-4 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-      >
-        See My Info
-      </button>
-      <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
-</footer>
+        <div className="mt-4 flex justify-center md:justify-start">
+          <button
+            type="button"
+            onClick={() => setVisitorInfoOpen(true)}
+            className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            See My Info
+          </button>
+        </div>
+        <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
+    </footer>
   );
 };
 
@@ -985,6 +986,7 @@ const routeShellVariants = routeTransition;
 
 export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [visitorInfoOpen, setVisitorInfoOpen] = useState(false);
   const location = useLocation();
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
