@@ -3,7 +3,7 @@
 export const siteConfig = {
   title: 'ZSFan 的 Blog',
   subtitle: '记录开发、折腾与思考',
-  description: 'Blog🙂',
+  description: 'ZSFan 的个人博客，记录开发、折腾与思考',
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
@@ -17,7 +17,7 @@ export const siteConfig = {
     name: 'ZSFan',
     avatar: 'https://q1.qlogo.cn/g?b=qq&nk=1453508737&s=100',
     role: 'Developer',
-    bio: 'Test 测试',
+    bio: 'Android 开发者，热爱折腾技术与 Cloudflare 生态',
   },
   toc: {
     collapseInactiveRootBranches: true,

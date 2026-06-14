@@ -1,7 +1,7 @@
 {
-  "name": "D-blog",
-  "short_name": "D-blog",
-  "description": "跑路的duck的技术分享和生活随笔",
+  "name": "ZSFan 的博客",
+  "short_name": "ZSFan Blog",
+  "description": "ZSFan 的个人博客，记录开发、折腾与思考",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f5f5f4",
