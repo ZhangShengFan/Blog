@@ -209,7 +209,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
         <button class="btn btn-sm btn-ghost" onclick="backToList()">← 返回</button>
         <h2 id="editor-title">新建文章</h2>
       </div>
-      <div class="editor-actions"><button class="btn btn-ghost" id="uploadImageBtn" type="button">上传图片</button>
+      <div class="editor-actions">
         <button class="btn btn-sm btn-ghost btn-danger" id="delete-btn" onclick="deletePost()" style="display:none">删除</button>
         <button class="btn btn-sm btn-ghost" type="button" onclick="previewPost()">预览文章</button>
         <button class="btn btn-sm btn-ghost" type="button" onclick="copyPostLink()">复制链接</button>
@@ -296,7 +296,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
         <button class="btn btn-sm btn-ghost" onclick="backToList()">← 返回</button>
         <h2 id="friend-editor-title">新建友链</h2>
       </div>
-      <div class="editor-actions"><button class="btn btn-ghost" id="uploadImageBtn" type="button">上传图片</button>
+      <div class="editor-actions">
         <button class="btn btn-sm btn-ghost btn-danger" id="friend-delete-btn" onclick="deleteFriend()" style="display:none">删除</button>
         <button class="btn btn-sm btn-ghost" onclick="backToList()">取消</button>
         <button class="btn btn-sm btn-accent" onclick="saveFriend()">保存到 GitHub</button>
@@ -1139,7 +1139,6 @@ function showToast(msg, type = '') {
   toastTimer = setTimeout(() => el.className = '', 3000);
 }
 </script>
-<input type="file" id="imageUploadInput" accept="image/*" hidden>
 
 <script>
 (function(){
@@ -1171,36 +1170,5 @@ function showToast(msg, type = '') {
 })();
 </script>
 
-<script>
-(function(){
-  const imageBtn = document.getElementById('uploadImageBtn');
-  const imageInput = document.getElementById('imageUploadInput');
-  if (imageBtn && imageInput) {
-    imageBtn.addEventListener('click', () => imageInput.click());
-    imageInput.addEventListener('change', async () => {
-      const file = imageInput.files && imageInput.files[0];
-      if (!file) return;
-      const form = new FormData();
-      form.append('file', file);
-      try {
-        const res = await fetch('/api/admin/upload-image', { method: 'POST', body: form });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || 'upload failed');
-        if (window.editor && data.url) {
-          const cm = window.editor.codemirror;
-          const pos = cm.getCursor();
-          cm.replaceRange(`![](${data.url})`, pos);
-        }
-        alert('图片上传成功');
-      } catch (e) {
-        console.error(e);
-        alert('图片上传失败：' + e.message);
-      } finally {
-        imageInput.value = '';
-      }
-    });
-  }
-})();
-</script>
 </body>
 </html>
