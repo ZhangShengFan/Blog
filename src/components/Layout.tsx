@@ -947,7 +947,7 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
             <button
               type="button"
               onClick={() => setVisitorInfoOpen(true)}
-              className="see-my-info-footer-link text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
               See My Info
             </button>
