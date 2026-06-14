@@ -782,8 +782,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
                 </button>
               </div>
 
-              <div className="h-[env(safe-area-inset-bottom,0px)]" />
-            </div>
+                          </div>
           </motion.aside>
         </div>
       )}
@@ -833,12 +832,12 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
   ];
 
   return (
-    <footer className="relative mt-12 overflow-hidden border-t border-zinc-200/90 py-12 dark:border-zinc-800/90 md:mt-32">
+    <footer className="relative mt-12 overflow-hidden border-t border-zinc-200/90 py-8 dark:border-zinc-800/90 md:mt-16">
       <div className="absolute left-1/2 top-0 h-px w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-zinc-900/30 to-transparent opacity-30 dark:via-zinc-100/30" />
-      <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.18 }} transition={{ duration: 0.35, ease: easeSmooth }} className="mx-auto max-w-7xl px-6">
+      <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.18 }} transition={{ duration: 0.35, ease: easeSmooth }} className="mx-auto max-w-7xl px-4 sm:px-6">
         {!isPostPage ? (
           <>
-            <div className="mb-8 grid grid-cols-2 gap-6 md:mb-12 md:grid-cols-3 md:gap-12">
+            <div className="mb-6 grid grid-cols-2 gap-4 md:mb-8 md:grid-cols-3 md:gap-8">
               <div className="col-span-2 flex flex-col items-center space-y-4 md:col-span-1 md:items-start">
                 <div>
                   <span className="font-serif text-xl font-bold tracking-tight text-ink dark:text-white">{siteConfig.title}</span>
@@ -869,7 +868,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
 
               <div className="flex flex-col items-center md:items-end">
                 <h4 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-zinc-700 dark:text-zinc-300 md:mb-6 md:text-sm md:tracking-widest">状态</h4>
-                <div className="grid w-full max-w-sm grid-cols-1 gap-2.5 rounded-2xl border border-zinc-200/70 bg-white/70 p-3 text-center dark:border-zinc-800/80 dark:bg-zinc-900/40 md:max-w-none md:border-0 md:bg-transparent md:p-0 md:text-right">
+                <div className="grid w-full max-w-sm grid-cols-1 gap-2 rounded-2xl border border-zinc-200/70 bg-white/70 p-2.5 text-center dark:border-zinc-800/80 dark:bg-zinc-900/40 md:max-w-none md:border-0 md:bg-transparent md:p-0 md:text-right">
                   <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 md:justify-end md:text-xs">
                     <span className="relative flex h-2 w-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
