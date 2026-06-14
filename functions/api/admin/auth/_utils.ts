@@ -3,6 +3,7 @@ export interface Env {
 }
 
 const PASSWORD_KEY = 'admin:password:v1';
+const TOKEN_KEY = 'admin:token:v1';
 const SESSION_PREFIX = 'admin:session:';
 const SESSION_COOKIE = 'admin_session';
 const SESSION_TTL = 60 * 60 * 24 * 30;
@@ -15,6 +16,14 @@ export async function sha256(text: string): Promise<string> {
 
 export async function getPasswordHash(env: Env) {
   return env.KV.get(PASSWORD_KEY);
+}
+
+export async function getToken(env: Env) {
+  return env.KV.get(TOKEN_KEY);
+}
+
+export async function setToken(env: Env, token: string) {
+  await env.KV.put(TOKEN_KEY, token);
 }
 
 export function json(data: unknown, status = 200, headers: Record<string, string> = {}) {
