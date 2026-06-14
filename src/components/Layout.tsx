@@ -946,7 +946,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
             <button
               type="button"
               onClick={onOpenVisitorInfo}
-              className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="inline-flex text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 md:ml-0 md:mr-auto"
             >
               See My Info
             </button>
