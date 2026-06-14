@@ -4,15 +4,13 @@ title: ZSFan Blog 详细部署教程
 excerpt: 从 0 到上线，基于 React + Vite + Cloudflare Pages 的完整部署教程
 date: 2026-06-14
 category: 教程
-tags:
+tags::
   - Cloudflare
   - Pages
   - 部署
   - React
   - Vite
-coverImage: /logo.png
-featured: false
-draft: false
+coverImage: https://pan.sanzhong.xyz/file/blog/deploy-tutorial.PNG
 ---
 
 # ZSFan Blog 详细部署教程：从 0 到上线，基于 React + Vite + Cloudflare Pages
