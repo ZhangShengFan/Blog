@@ -627,7 +627,7 @@ async function getFileContent(path) {
 async function loadData() {
   showLoading(true);
   try {
-    const [postFiles, friendFiles, settingsFile] = await Promise.all([listDir('posts'), listDir('friends'), getFileContent('config/site.config.ts')]);
+    const [postFiles, friendFiles, settingsFile] = await Promise.all([listDir('Posts'), listDir('friends'), getFileContent('config/site.config.ts')]);
     posts = postFiles.filter(f => f.name.endsWith('.md')).map(f => ({ name: f.name, sha: f.sha, path: f.path }));
     friends = friendFiles.filter(f => f.name.endsWith('.json')).map(f => ({ name: f.name, sha: f.sha, path: f.path }));
     currentSettings = { sha: settingsFile.sha, raw: settingsFile.content };
@@ -800,7 +800,7 @@ async function savePost() {
 
   const content = `${frontmatter}\n\n${body}\n`;
   const encoded = btoa(unescape(encodeURIComponent(content)));
-  const filePath = `posts/${id}.md`;
+  const filePath = `Posts/${id}.md`;
 
   showLoading(true);
   try {

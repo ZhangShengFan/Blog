@@ -5,7 +5,7 @@ let postsSearchIndexCache: SearchIndexEntry[] | null = null;
 const SEARCH_CACHE_LIMIT = 80;
 const searchResultsCache = new Map<string, PostSearchResult[]>();
 
-const postFiles = import.meta.glob('../../posts/*.md', { query: '?raw', import: 'default' });
+const postFiles = import.meta.glob('../../Posts/*.md', { query: '?raw', import: 'default' });
 
 const loadPostsData = async (): Promise<PostMetadata[]> => {
   if (postsDataCache) {
