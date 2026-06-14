@@ -810,15 +810,16 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
         return;
       }
 
-      const totalMinutes = Math.floor(diff / (1000 * 60));
-      const days = Math.floor(totalMinutes / (60 * 24));
-      const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-      const minutes = totalMinutes % 60;
-      setRuntimeText(`${days}天 ${hours}小时 ${minutes}分钟`);
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / (24 * 60 * 60));
+      const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+      const seconds = totalSeconds % 60;
+      setRuntimeText(`${days}天 ${hours}小时 ${minutes}分钟 ${seconds}秒`);
     };
 
     updateRuntime();
-    const timer = window.setInterval(updateRuntime, 60000);
+    const timer = window.setInterval(updateRuntime, 1000);
 
     return () => window.clearInterval(timer);
   }, [isPostPage]);
