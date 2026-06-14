@@ -133,18 +133,22 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 <!-- Login Screen -->
 <div id="login-screen">
   <div class="login-card">
-    <h1>Blog Admin</h1>
-    <p>输入密码进入管理后台</p>
-    <div class="field">
+    <h1 id="login-title">Blog Admin</h1>
+    <p id="login-desc">输入后台密码与 GitHub Token 进入管理后台</p>
+    <div class="field" id="password-field">
       <label>密码</label>
       <input type="password" id="password-input" placeholder="请输入密码" autocomplete="current-password">
+    </div>
+    <div class="field" id="password-confirm-field" style="display:none">
+      <label>确认密码</label>
+      <input type="password" id="password-confirm-input" placeholder="请再次输入密码" autocomplete="new-password">
     </div>
     <div class="field">
       <label>GitHub Token</label>
       <input type="password" id="token-input" placeholder="ghp_xxx 或 github_pat_xxx" autocomplete="off">
-      <span style="font-size:11px;color:var(--muted);margin-top:2px">用于提交文章到 GitHub，仅存在本地内存中</span>
+      <span style="font-size:11px;color:var(--muted);margin-top:2px">仅 GitHub Token 保存在本地浏览器；后台登录状态使用 Cloudflare KV 持久化</span>
     </div>
-    <button class="btn btn-primary" onclick="doLogin()">登录</button>
+    <button class="btn btn-primary" onclick="handleAuthSubmit()" id="login-submit-btn">登录</button>
     <p class="error-msg" id="login-error">密码错误，请重试</p>
   </div>
 </div>
@@ -393,85 +397,200 @@ async function sha256(str) {
 }
 
 // ── 登录 ──────────────────────────────────────────
-function persistAuth(password, token) {
+const TOKEN_STORAGE_KEY = 'admin-gh-token';
+let authMode = 'login';
+let sessionAuthenticated = false;
+
+function persistToken(token) {
   try {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ password, token }));
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
   } catch (error) {
-    console.warn('Failed to persist auth:', error);
+    console.warn('Failed to persist token:', error);
   }
 }
 
-function clearPersistedAuth() {
+function clearPersistedToken() {
   try {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
   } catch (error) {
-    console.warn('Failed to clear persisted auth:', error);
+    console.warn('Failed to clear token:', error);
   }
+}
+
+function restorePersistedToken() {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
+  } catch (error) {
+    console.warn('Failed to restore token:', error);
+    return '';
+  }
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const title = document.getElementById('login-title');
+  const desc = document.getElementById('login-desc');
+  const passwordField = document.getElementById('password-field');
+  const confirmField = document.getElementById('password-confirm-field');
+  const submitBtn = document.getElementById('login-submit-btn');
+  const error = document.getElementById('login-error');
+  if (error) error.style.display = 'none';
+
+  if (mode === 'setup') {
+    if (title) title.textContent = '首次设置后台密码';
+    if (desc) desc.textContent = '首次进入后台，请先设置登录密码，再输入 GitHub Token。';
+    if (passwordField) passwordField.style.display = 'block';
+    if (confirmField) confirmField.style.display = 'block';
+    if (submitBtn) submitBtn.textContent = '设置密码并进入后台';
+    return;
+  }
+
+  if (mode === 'session') {
+    if (title) title.textContent = '继续进入后台';
+    if (desc) desc.textContent = '已检测到持久化登录状态，输入 GitHub Token 即可进入后台。';
+    if (passwordField) passwordField.style.display = 'none';
+    if (confirmField) confirmField.style.display = 'none';
+    if (submitBtn) submitBtn.textContent = '进入后台';
+    return;
+  }
+
+  if (title) title.textContent = 'Blog Admin';
+  if (desc) desc.textContent = '输入后台密码与 GitHub Token 进入管理后台';
+  if (passwordField) passwordField.style.display = 'block';
+  if (confirmField) confirmField.style.display = 'none';
+  if (submitBtn) submitBtn.textContent = '登录';
 }
 
 function setAuthInputs(password = '', token = '') {
   const passwordInput = document.getElementById('password-input');
+  const confirmInput = document.getElementById('password-confirm-input');
   const tokenInput = document.getElementById('token-input');
   if (passwordInput) passwordInput.value = password;
+  if (confirmInput) confirmInput.value = '';
   if (tokenInput) tokenInput.value = token;
 }
 
-async function tryRestoreLogin() {
+async function fetchAuthStatus() {
+  const res = await fetch('/api/admin/auth/status', { credentials: 'same-origin' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function restoreLogin() {
   try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) return;
-    const saved = JSON.parse(raw);
-    const password = typeof saved?.password === 'string' ? saved.password : '';
-    const token = typeof saved?.token === 'string' ? saved.token : '';
-    if (!password || !token) {
-      clearPersistedAuth();
+    const status = await fetchAuthStatus();
+    sessionAuthenticated = !!status.authenticated;
+    const savedToken = restorePersistedToken();
+    setAuthInputs('', savedToken);
+
+    if (!status.initialized) {
+      setAuthMode('setup');
       return;
     }
-    setAuthInputs(password, token);
-    await doLogin(true);
+
+    if (status.authenticated) {
+      if (savedToken && (savedToken.startsWith('ghp_') || savedToken.startsWith('github_pat_'))) {
+        ghToken = savedToken;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        loadData();
+      } else {
+        setAuthMode('session');
+      }
+      return;
+    }
+
+    setAuthMode('login');
   } catch (error) {
     console.warn('Failed to restore login:', error);
-    clearPersistedAuth();
+    setAuthMode('login');
   }
 }
 
-async function doLogin(isRestore = false) {
+async function handleAuthSubmit() {
   const pwd = document.getElementById('password-input').value;
+  const confirmPwd = document.getElementById('password-confirm-input')?.value || '';
   const token = document.getElementById('token-input').value.trim();
-  const hash = await sha256(pwd);
+  const error = document.getElementById('login-error');
 
-  // 对比哈希值
-  const correctHash = await sha256('@ZSFan1224');
-  if (hash !== correctHash) {
-    document.getElementById('login-error').style.display = 'block';
-    return;
-  }
   if (!token || !(token.startsWith('ghp_') || token.startsWith('github_pat_'))) {
     showToast('请输入有效的 GitHub Token', 'error');
     return;
   }
+
+  if (authMode === 'session') {
+    ghToken = token;
+    persistToken(token);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadData();
+    return;
+  }
+
+  if (!pwd || pwd.length < 6) {
+    error.textContent = '密码至少需要 6 位';
+    error.style.display = 'block';
+    return;
+  }
+
+  if (authMode === 'setup' && pwd !== confirmPwd) {
+    error.textContent = '两次输入的密码不一致';
+    error.style.display = 'block';
+    return;
+  }
+
+  const endpoint = authMode === 'setup' ? '/api/admin/auth/setup' : '/api/admin/auth/login';
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok || !result.ok) {
+    error.textContent = result.error || '登录失败';
+    error.style.display = 'block';
+    return;
+  }
+
+  sessionAuthenticated = true;
   ghToken = token;
+  persistToken(token);
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
+  error.style.display = 'none';
+  setAuthInputs('', token);
   loadData();
 }
 
 document.getElementById('password-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (authMode === 'setup') document.getElementById('password-confirm-input').focus();
+    else document.getElementById('token-input').focus();
+  }
+});
+document.getElementById('password-confirm-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('token-input').focus();
 });
 document.getElementById('token-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
+  if (e.key === 'Enter') handleAuthSubmit();
 });
 
 function logout() {
   ghToken = '';
   posts = [];
   friends = [];
+  clearPersistedToken();
+  fetch('/api/admin/auth/logout', { method: 'POST', credentials: 'same-origin' }).catch(error => {
+    console.warn('Logout failed:', error);
+  });
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('password-input').value = '';
-  document.getElementById('token-input').value = '';
+  setAuthInputs();
+  setAuthMode(sessionAuthenticated ? 'session' : 'login');
 }
+
+restoreLogin();
 
 // ── GitHub API ────────────────────────────────────
 async function ghAPI(path, method = 'GET', body = null) {
