@@ -365,6 +365,14 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
         </div>
 
         <div class="sidebar-card">
+          <div class="sidebar-card-title">Umami 配置</div>
+          <div class="form-group"><label class="form-label">脚本地址</label><input class="form-input" id="s-umami-script-src" placeholder="https://cloud.umami.is/script.js"></div>
+          <div class="form-group"><label class="form-label">Website ID</label><input class="form-input" id="s-umami-website-id" placeholder="a94473a1-ffcb-421b-8ebc-70eb7c821ee6"></div>
+          <div class="form-group"><label class="form-label">统计分享链接</label><input class="form-input" id="s-umami-share-url" placeholder="https://cloud.umami.is/share/..."></div>
+          <div class="form-group"><label class="form-label">状态页链接</label><input class="form-input" id="s-status-page-url" placeholder="https://stats.uptimerobot.com/..."></div>
+        </div>
+
+        <div class="sidebar-card">
           <div class="sidebar-card-title">友链页面</div>
           <div class="form-group"><label class="form-label">仓库地址</label><input class="form-input" id="s-repoUrl" placeholder="https://github.com/ZhangShengFan/Blog"></div>
           <div class="form-group"><label class="form-label">友链目录地址</label><input class="form-input" id="s-repoFriendsUrl" placeholder="https://github.com/ZhangShengFan/Blog/tree/main/friends"></div>
@@ -1029,6 +1037,10 @@ function renderSettingsForm() {
     's-rawEmail': cfg.rawEmail,
     's-beian-text': cfg.beianText,
     's-beian-url': cfg.beianUrl,
+    's-umami-script-src': cfg.umamiScriptSrc,
+    's-umami-website-id': cfg.umamiWebsiteId,
+    's-umami-share-url': cfg.umamiShareUrl,
+    's-status-page-url': cfg.statusPageUrl,
     's-repoUrl': cfg.repoUrl,
     's-repoFriendsUrl': cfg.repoFriendsUrl,
     's-repoFriendsDir': cfg.repoFriendsDir,
@@ -1066,6 +1078,10 @@ async function saveSiteSettings() {
     announcement: document.getElementById('s-announcement').value.trim(),
     beianText: document.getElementById('s-beian-text').value.trim(),
     beianUrl: document.getElementById('s-beian-url').value.trim(),
+    umamiScriptSrc: document.getElementById('s-umami-script-src').value.trim(),
+    umamiWebsiteId: document.getElementById('s-umami-website-id').value.trim(),
+    umamiShareUrl: document.getElementById('s-umami-share-url').value.trim(),
+    statusPageUrl: document.getElementById('s-status-page-url').value.trim(),
   };
 
   if (!data.title || !data.description || !data.url || !data.authorName) {
@@ -1106,6 +1122,12 @@ export const siteConfig = {
   beian: {
     text: '${escTS(data.beianText)}',
     url: '${escTS(data.beianUrl)}',
+  },
+  analytics: {
+    umamiScriptSrc: '${escTS(data.umamiScriptSrc || 'https://cloud.umami.is/script.js')}',
+    umamiWebsiteId: '${escTS(data.umamiWebsiteId)}',
+    umamiShareUrl: '${escTS(data.umamiShareUrl)}',
+    statusPageUrl: '${escTS(data.statusPageUrl)}',
   },
 };
 `;

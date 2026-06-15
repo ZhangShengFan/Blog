@@ -33,4 +33,10 @@ export const siteConfig = {
     text: '',
     url: '',
   },
+  analytics: {
+    umamiScriptSrc: 'https://cloud.umami.is/script.js',
+    umamiWebsiteId: 'a94473a1-ffcb-421b-8ebc-70eb7c821ee6',
+    umamiShareUrl: 'https://cloud.umami.is/share/Bdor1JZalpGTV6rF',
+    statusPageUrl: 'https://stats.uptimerobot.com/brdUi25J7V',
+  },
 };
