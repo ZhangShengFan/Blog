@@ -806,7 +806,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       const diff = now.getTime() - startedAt.getTime();
 
       if (Number.isNaN(diff) || diff < 0) {
-        setRuntimeText('运行中');
+        setRuntimeText(siteConfig.runtimeInvalidText || '运行中');
         return;
       }
 
@@ -815,7 +815,15 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
       const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
       const seconds = totalSeconds % 60;
-      setRuntimeText(`${days}天 ${hours}小时 ${minutes}分钟 ${seconds}秒`);
+      const parts = [`${days}天`];
+
+      if (siteConfig.runtimeShowHours) parts.push(`${hours}小时`);
+      if (siteConfig.runtimeShowMinutes) parts.push(`${minutes}分钟`);
+      if (siteConfig.runtimeShowSeconds) parts.push(`${seconds}秒`);
+
+      const prefix = siteConfig.runtimePrefix || '本站已运行';
+      const suffix = siteConfig.runtimeSuffix ? ` ${siteConfig.runtimeSuffix}` : '';
+      setRuntimeText(`${prefix} ${parts.join(' ')}${suffix}`.trim());
     };
 
     updateRuntime();
@@ -873,6 +881,12 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
                 <div>
                   <span className="font-serif text-xl font-bold tracking-tight text-ink dark:text-white">{siteConfig.title}</span>
                   <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{siteConfig.subtitle}</p>
+                {runtimeText ? (
+                  <p className="mt-2 inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    <Clock3 size={14} />
+                    <span>{runtimeText}</span>
+                  </p>
+                ) : null}
                 </div>
                 <p className="text-center text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-left">{siteConfig.description}</p>
                 <div className="flex items-center gap-4 pt-2">
