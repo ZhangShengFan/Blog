@@ -7,7 +7,6 @@ export const siteConfig = {
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
-  runtimeStartDate: '2026-06-14',
   url: 'https://blog.zsfan8986.dpdns.org',
   social: {
     github: 'https://github.com/ZhangShengFan/',
@@ -35,8 +34,8 @@ export const siteConfig = {
   },
   analytics: {
     umamiScriptSrc: 'https://cloud.umami.is/script.js',
-    umamiWebsiteId: 'a94473a1-ffcb-421b-8ebc-70eb7c821ee6',
-    umamiShareUrl: 'https://cloud.umami.is/share/Bdor1JZalpGTV6rF',
+    umamiWebsiteId: '',
+    umamiShareUrl: '',
     statusPageUrl: 'https://stats.uptimerobot.com/brdUi25J7V',
   },
 };
