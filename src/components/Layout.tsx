@@ -793,6 +793,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
   const [runtimeText, setRuntimeText] = useState<string>('');
+  const runtimePrefix = siteConfig.runtimePrefix || '本站运行时间';
 
   useEffect(() => {
     if (isPostPage) {
@@ -806,7 +807,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       const diff = now.getTime() - startedAt.getTime();
 
       if (Number.isNaN(diff) || diff < 0) {
-        setRuntimeText('运行中');
+        setRuntimeText(`${runtimePrefix} 运行中`);
         return;
       }
 
@@ -815,13 +816,14 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
       const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
       const seconds = totalSeconds % 60;
-      const parts = [`${days}天`];
+      const parts = [];
 
+      if (days > 0) parts.push(`${days}天`);
       if (siteConfig.runtimeShowHours) parts.push(`${hours}小时`);
       if (siteConfig.runtimeShowMinutes) parts.push(`${minutes}分钟`);
       if (siteConfig.runtimeShowSeconds) parts.push(`${seconds}秒`);
 
-      setRuntimeText(parts.join(' '));
+      setRuntimeText(`${runtimePrefix} ${parts.join(' ')}`.trim());
     };
 
     updateRuntime();
