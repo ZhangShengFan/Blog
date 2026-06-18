@@ -33,8 +33,7 @@ html{font-family:'Inter',system-ui,sans-serif;font-size:14px;-webkit-font-smooth
 body{background:var(--bg);color:var(--text);min-height:100dvh;transition:background .2s,color .2s}
 
 /* ── Login ── */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:380px;box-shadow:0 18px 50px rgba(15,23,42,.08)}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:380px;box-shadow:0 18px 50px rgba(15,23,42,.08);position:relative;z-index:1}
 .login-card h1{font-size:18px;font-weight:600;margin-bottom:6px}
 .login-card p{color:var(--muted);font-size:13px;margin-bottom:28px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
@@ -51,6 +50,12 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
 .btn-danger{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.16);color:var(--error)}
 .btn-danger:hover{background:rgba(220,38,38,.16)}
 .error-msg{color:var(--error);font-size:12px;margin-top:8px;display:none}
+
+/* ── Login Shell ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px;background:linear-gradient(135deg, color-mix(in srgb,var(--bg) 88%,transparent), color-mix(in srgb,var(--surface-2) 72%,transparent));position:relative}
+.login-shell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;width:100%;max-width:420px}
+.login-shell .login-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em;margin-bottom:4px;text-align:center}
+.login-shell .login-desc{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
 
 /* ── App Shell ── */
 #app{display:none;flex-direction:column;min-height:100dvh}
@@ -149,7 +154,8 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
 
 <!-- Login Screen -->
 <div id="login-screen">
-  <div class="login-card">
+  <div class="login-shell">
+    <div class="login-card">
     <h1 id="login-title">Blog Admin</h1>
     <p id="login-desc">输入后台密码与 GitHub Token 进入管理后台</p>
     <div class="field" id="password-field">
@@ -167,6 +173,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
     </div>
     <button class="btn btn-primary" onclick="handleAuthSubmit()" id="login-submit-btn">登录</button>
     <p class="error-msg" id="login-error">密码错误，请重试</p>
+  </div>
   </div>
 </div>
 
