@@ -19,7 +19,7 @@
 :root{
   --bg:#f5f5f4;--surface:#ffffff;--surface-2:#fafaf9;--border:#e7e5e4;
   --text:#1c1917;--muted:#78716c;--faint:#a8a29e;
-  --primary:#0f172a;--primary-hover:#1e293b;
+  --primary:#0f172a;--primary-hover:#1e293b;--primary-contrast:#ffffff;
   --accent:#2563eb;--accent-hover:#1d4ed8;
   --error:#dc2626;--success:#16a34a;
   --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
@@ -27,10 +27,10 @@
 [data-theme="dark"]{
   --bg:#111110;--surface:#1c1b1a;--surface-2:#232221;--border:#2e2c2b;
   --text:#e7e5e4;--muted:#a8a29e;--faint:#57534e;
-  --primary:#f5f5f4;--primary-hover:#e7e5e4;
+  --primary:#f5f5f4;--primary-hover:#e7e5e4;--primary-contrast:#111110;
 }
-html{font-family:'Inter',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
-body{background:var(--bg);color:var(--text);min-height:100dvh}
+html{font-family:'Inter',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;color-scheme:light dark}
+body{background:var(--bg);color:var(--text);min-height:100dvh;transition:background .2s,color .2s}
 
 /* ── Login ── */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px}
@@ -42,7 +42,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 .field input{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:14px;color:var(--text);outline:none;transition:border-color .15s}
 .field input:focus{border-color:var(--accent)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:background .15s,opacity .15s}
-.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary{background:var(--primary);color:var(--primary-contrast);width:100%}
 .btn-primary:hover{background:var(--primary-hover)}
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
@@ -60,6 +60,9 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 .tab{padding:5px 12px;border-radius:6px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-weight:500;transition:background .15s,color .15s}
 .tab.active,.tab:hover{background:var(--bg);color:var(--text)}
 .topbar-right{display:flex;align-items:center;gap:8px}
+.theme-toggle{min-width:92px}
+.theme-toggle .theme-toggle-icon{font-size:14px;line-height:1}
+.theme-toggle .theme-toggle-label{font-size:12px}
 
 /* ── Panels ── */
 .panel{display:none;flex:1;padding:24px;max-width:1100px;margin:0 auto;width:100%}
@@ -111,7 +114,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 .btn-accent:hover{background:var(--accent-hover)}
 
 /* Toast */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--primary);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--primary);color:var(--primary-contrast);padding:10px 16px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none}
 #toast.show{opacity:1;transform:translateY(0)}
 #toast.error{background:var(--error)}
 #toast.success{background:var(--success)}
@@ -171,6 +174,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
       </nav>
     </div>
     <div class="topbar-right">
+      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn"><span class="theme-toggle-icon">🌞</span><span class="theme-toggle-label">浅色</span></button>
       <button class="btn btn-sm btn-ghost" onclick="logout()">退出</button>
     </div>
   </div>
@@ -409,6 +413,78 @@ let currentSettings = { sha: null, raw: '' };
 let easyMDE = null;
 let currentTab = 'posts';
 
+const ADMIN_THEME_KEY = 'admin-theme';
+let currentTheme = 'light';
+
+function getPreferredTheme() {
+  try {
+    const saved = localStorage.getItem(ADMIN_THEME_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch (error) {
+    console.warn('Failed to read theme:', error);
+  }
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function getThemeMetaTag() {
+  return document.querySelector('meta[name="theme-color"]');
+}
+
+function updateThemeToggle() {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (!btn) return;
+  const icon = btn.querySelector('.theme-toggle-icon');
+  const label = btn.querySelector('.theme-toggle-label');
+  const isDark = currentTheme === 'dark';
+  if (icon) icon.textContent = isDark ? '🌙' : '🌞';
+  if (label) label.textContent = isDark ? '暗色' : '浅色';
+}
+
+function applyTheme(theme, persist = true) {
+  currentTheme = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  const meta = getThemeMetaTag();
+  if (meta) meta.setAttribute('content', currentTheme === 'dark' ? '#111110' : '#f5f5f4');
+  updateThemeToggle();
+  if (persist) {
+    try {
+      localStorage.setItem(ADMIN_THEME_KEY, currentTheme);
+    } catch (error) {
+      console.warn('Failed to persist theme:', error);
+    }
+  }
+}
+
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+
+function initTheme() {
+  applyTheme(getPreferredTheme(), false);
+  try {
+    localStorage.setItem(ADMIN_THEME_KEY, currentTheme);
+  } catch (error) {
+    console.warn('Failed to init theme:', error);
+  }
+  if (window.matchMedia) {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = event => {
+      let saved = null;
+      try {
+        saved = localStorage.getItem(ADMIN_THEME_KEY);
+      } catch (error) {
+        console.warn('Failed to read theme during change:', error);
+      }
+      if (saved !== 'light' && saved !== 'dark') {
+        applyTheme(event.matches ? 'dark' : 'light', false);
+      }
+    };
+    if (typeof media.addEventListener === 'function') media.addEventListener('change', handleChange);
+    else if (typeof media.addListener === 'function') media.addListener(handleChange);
+  }
+}
+
+
 // ── 密码哈希 ──────────────────────────────────────
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -612,6 +688,7 @@ function logout() {
   setAuthMode('login');
 }
 
+initTheme();
 restoreLogin();
 
 // ── GitHub API ────────────────────────────────────
