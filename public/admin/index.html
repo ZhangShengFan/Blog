@@ -366,10 +366,10 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 
         <div class="sidebar-card">
           <div class="sidebar-card-title">Umami 配置</div>
-          <div class="form-group"><label class="form-label">脚本地址</label><input class="form-input" id="s-umami-script-src" placeholder="https://cloud.umami.is/script.js"></div>
-          <div class="form-group"><label class="form-label">Website ID</label><input class="form-input" id="s-umami-website-id" placeholder="a94473a1-ffcb-421b-8ebc-70eb7c821ee6"></div>
-          <div class="form-group"><label class="form-label">统计分享链接</label><input class="form-input" id="s-umami-share-url" placeholder="https://cloud.umami.is/share/..."></div>
-          <div class="form-group"><label class="form-label">状态页链接</label><input class="form-input" id="s-status-page-url" placeholder="https://stats.uptimerobot.com/..."></div>
+          <div class="form-group"><label class="form-label">脚本地址</label><input class="form-input" id="s-umami-script-src" placeholder=""></div>
+          <div class="form-group"><label class="form-label">Website ID</label><input class="form-input" id="s-umami-website-id" placeholder=""></div>
+          <div class="form-group"><label class="form-label">统计分享链接</label><input class="form-input" id="s-umami-share-url" placeholder=""></div>
+          <div class="form-group"><label class="form-label">状态页链接</label><input class="form-input" id="s-status-page-url" placeholder=""></div>
         </div>
 
         <div class="sidebar-card">
@@ -1015,6 +1015,10 @@ function parseSiteConfig(source) {
     announcement: readConfigValue(source, /announcement:\s*'([^']*)'/),
     beianText: readConfigValue(source, /beian:\s*\{[\s\S]*?text:\s*'([^']*)'/),
     beianUrl: readConfigValue(source, /beian:\s*\{[\s\S]*?url:\s*'([^']*)'/),
+    umamiScriptSrc: readConfigValue(source, /analytics:\s*\{[\s\S]*?umamiScriptSrc:\s*'([^']*)'/),
+    umamiWebsiteId: readConfigValue(source, /analytics:\s*\{[\s\S]*?umamiWebsiteId:\s*'([^']*)'/),
+    umamiShareUrl: readConfigValue(source, /analytics:\s*\{[\s\S]*?umamiShareUrl:\s*'([^']*)'/),
+    statusPageUrl: readConfigValue(source, /analytics:\s*\{[\s\S]*?statusPageUrl:\s*'([^']*)'/),
   };
 }
 
