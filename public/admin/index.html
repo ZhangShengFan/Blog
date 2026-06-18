@@ -67,7 +67,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
 .tab:hover{background:var(--surface);color:var(--text);transform:translateY(-1px)}
 .tab.active{background:var(--surface);color:var(--text);box-shadow:0 8px 24px rgba(15,23,42,.08)}
 .topbar-right{display:flex;align-items:center;gap:10px}
-.theme-toggle{position:relative;border:none!important;border-radius:999px!important;background:var(--surface-2)!important;color:var(--text)!important;width:40px;height:40px;padding:0!important;min-width:40px;box-shadow:none;transition:all .3s ease}
+.theme-toggle{position:relative;border:none!important;border-radius:999px!important;background:var(--surface-2)!important;color:var(--text)!important;width:40px;height:40px;padding:0!important;min-width:40px;box-shadow:none;transition:all .3s ease;display:inline-flex;align-items:center;justify-content:center}
 .theme-toggle:hover{background:var(--surface)!important;box-shadow:0 0 0 2px rgba(24,24,27,.12)}
 [data-theme="dark"] .theme-toggle{background:#27272a!important;color:#fbbf24!important}
 [data-theme="dark"] .theme-toggle:hover{box-shadow:0 0 0 2px rgba(244,244,245,.16)}
@@ -193,7 +193,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
       </nav>
     </div>
     <div class="topbar-right">
-      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="切换主题"><span class="theme-toggle-icon-wrap"><svg class="theme-toggle-icon-light" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.34 6.34l1.42 1.42M16.24 16.24l1.42 1.42M6.34 17.66l1.42-1.42M16.24 7.76l1.42-1.42" stroke="currentColor" stroke-width="1.5"/></svg><svg class="theme-toggle-icon-dark" viewBox="0 0 24 24" fill="none" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></span><span class="theme-toggle-tooltip">跟随系统</span></button>
+      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="切换主题"><span class="theme-toggle-icon-wrap"><svg class="theme-toggle-icon-light" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="var(--text)" stroke-width="1.5"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.34 6.34l1.42 1.42M16.24 16.24l1.42 1.42M6.34 17.66l1.42-1.42M16.24 7.76l1.42-1.42" stroke="var(--text)" stroke-width="1.5"/></svg><svg class="theme-toggle-icon-dark" viewBox="0 0 24 24" fill="none" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="var(--text)" stroke-width="1.5" fill="none"/></svg></span><span class="theme-toggle-tooltip">跟随系统</span></button>
       <button class="btn btn-sm btn-ghost" onclick="logout()" style="border-radius:999px;padding:8px 14px;font-weight:600;background:var(--surface-2)">退出</button>
     </div>
   </div>
