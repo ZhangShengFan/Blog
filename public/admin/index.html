@@ -152,7 +152,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
     <div class="field">
       <label>GitHub Token</label>
       <input type="password" id="token-input" placeholder="ghp_xxx 或 github_pat_xxx" autocomplete="off">
-      <span style="font-size:11px;color:var(--muted);margin-top:2px">仅 GitHub Token 保存在本地浏览器；后台登录状态使用 Cloudflare KV 持久化</span>
+      <span id="token-help" style="font-size:11px;color:var(--muted);margin-top:2px">GitHub Token 将保存在云端 KV；已保存后换设备登录无需再次输入，留空表示继续使用当前 Token</span>
     </div>
     <button class="btn btn-primary" onclick="handleAuthSubmit()" id="login-submit-btn">登录</button>
     <p class="error-msg" id="login-error">密码错误，请重试</p>
@@ -411,34 +411,22 @@ async function sha256(str) {
 }
 
 // ── 登录 ──────────────────────────────────────────
-const TOKEN_STORAGE_KEY = 'admin-gh-token';
 let authMode = 'login';
 let sessionAuthenticated = false;
+let authStatus = { initialized: false, authenticated: false, hasToken: false };
 
-function persistToken(token) {
-  try {
-    localStorage.setItem(TOKEN_STORAGE_KEY, token);
-  } catch (error) {
-    console.warn('Failed to persist token:', error);
+function updateTokenHint() {
+  const hint = document.getElementById('token-help');
+  if (!hint) return;
+  if (authMode === 'setup') {
+    hint.textContent = '首次初始化必须输入 GitHub Token，保存后会存入云端 KV。';
+    return;
   }
+  hint.textContent = authStatus.hasToken
+    ? '当前 GitHub Token 已保存到云端，留空即可继续使用；输入新 Token 可覆盖旧值。'
+    : '当前还没有保存 GitHub Token，请输入一次并保存到云端。';
 }
 
-function clearPersistedToken() {
-  try {
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
-  } catch (error) {
-    console.warn('Failed to clear token:', error);
-  }
-}
-
-function restorePersistedToken() {
-  try {
-    return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
-  } catch (error) {
-    console.warn('Failed to restore token:', error);
-    return '';
-  }
-}
 
 function setAuthMode(mode) {
   authMode = mode;
@@ -452,27 +440,30 @@ function setAuthMode(mode) {
 
   if (mode === 'setup') {
     if (title) title.textContent = '首次设置后台密码';
-    if (desc) desc.textContent = '首次进入后台，请先设置登录密码，再输入 GitHub Token。';
+    if (desc) desc.textContent = '首次进入后台，请先设置登录密码，并保存一个 GitHub Token 到云端。';
     if (passwordField) passwordField.style.display = 'block';
     if (confirmField) confirmField.style.display = 'block';
     if (submitBtn) submitBtn.textContent = '设置密码并进入后台';
+    updateTokenHint();
     return;
   }
 
   if (mode === 'session') {
     if (title) title.textContent = '继续进入后台';
-    if (desc) desc.textContent = '已检测到持久化登录状态，输入 GitHub Token 即可进入后台。';
+    if (desc) desc.textContent = '登录状态已恢复，正在进入后台。';
     if (passwordField) passwordField.style.display = 'none';
     if (confirmField) confirmField.style.display = 'none';
     if (submitBtn) submitBtn.textContent = '进入后台';
+    updateTokenHint();
     return;
   }
 
   if (title) title.textContent = 'Blog Admin';
-  if (desc) desc.textContent = '输入后台密码与 GitHub Token 进入管理后台';
+  if (desc) desc.textContent = '输入后台密码进入管理后台；如需更新 GitHub Token，可在下方输入新值。';
   if (passwordField) passwordField.style.display = 'block';
   if (confirmField) confirmField.style.display = 'none';
   if (submitBtn) submitBtn.textContent = '登录';
+  updateTokenHint();
 }
 
 function setAuthInputs(password = '', token = '') {
@@ -481,7 +472,7 @@ function setAuthInputs(password = '', token = '') {
   const tokenInput = document.getElementById('token-input');
   if (passwordInput) passwordInput.value = password;
   if (confirmInput) confirmInput.value = '';
-  if (tokenInput) tokenInput.value = token;
+  if (tokenInput) tokenInput.value = token || '';
 }
 
 async function fetchAuthStatus() {
@@ -493,24 +484,24 @@ async function fetchAuthStatus() {
 async function restoreLogin() {
   try {
     const status = await fetchAuthStatus();
-    sessionAuthenticated = !!status.authenticated;
-    const savedToken = restorePersistedToken();
-    setAuthInputs('', savedToken);
+    authStatus = {
+      initialized: !!status.initialized,
+      authenticated: !!status.authenticated,
+      hasToken: !!status.hasToken,
+    };
+    sessionAuthenticated = authStatus.authenticated;
+    setAuthInputs('', '');
 
-    if (!status.initialized) {
+    if (!authStatus.initialized) {
       setAuthMode('setup');
       return;
     }
 
-    if (status.authenticated) {
-      if (savedToken && (savedToken.startsWith('ghp_') || savedToken.startsWith('github_pat_'))) {
-        ghToken = savedToken;
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        loadData();
-      } else {
-        setAuthMode('session');
-      }
+    if (authStatus.authenticated) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      updateTokenHint();
+      loadData();
       return;
     }
 
@@ -526,18 +517,11 @@ async function handleAuthSubmit() {
   const confirmPwd = document.getElementById('password-confirm-input')?.value || '';
   const token = document.getElementById('token-input').value.trim();
   const error = document.getElementById('login-error');
+  const hasInputToken = !!token;
+  const hasStoredToken = !!authStatus.hasToken;
 
-  if (!token || !(token.startsWith('ghp_') || token.startsWith('github_pat_'))) {
+  if (hasInputToken && !(token.startsWith('ghp_') || token.startsWith('github_pat_'))) {
     showToast('请输入有效的 GitHub Token', 'error');
-    return;
-  }
-
-  if (authMode === 'session') {
-    ghToken = token;
-    persistToken(token);
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    loadData();
     return;
   }
 
@@ -553,12 +537,27 @@ async function handleAuthSubmit() {
     return;
   }
 
+  if (authMode === 'setup' && !hasInputToken) {
+    error.textContent = '首次初始化必须输入 GitHub Token';
+    error.style.display = 'block';
+    return;
+  }
+
+  if (authMode !== 'setup' && !hasStoredToken && !hasInputToken) {
+    error.textContent = '当前还没有保存 GitHub Token，请先输入一次';
+    error.style.display = 'block';
+    return;
+  }
+
   const endpoint = authMode === 'setup' ? '/api/admin/auth/setup' : '/api/admin/auth/login';
+  const payload = { password: pwd };
+  if (hasInputToken) payload.token = token;
+
   const res = await fetch(endpoint, {
     method: 'POST',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: pwd })
+    body: JSON.stringify(payload)
   });
   const result = await res.json().catch(() => ({}));
   if (!res.ok || !result.ok) {
@@ -568,12 +567,16 @@ async function handleAuthSubmit() {
   }
 
   sessionAuthenticated = true;
-  ghToken = token;
-  persistToken(token);
+  authStatus = {
+    initialized: true,
+    authenticated: true,
+    hasToken: hasStoredToken || hasInputToken,
+  };
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   error.style.display = 'none';
-  setAuthInputs('', token);
+  setAuthInputs('', '');
+  updateTokenHint();
   loadData();
 }
 
@@ -594,29 +597,29 @@ function logout() {
   ghToken = '';
   posts = [];
   friends = [];
-  clearPersistedToken();
   fetch('/api/admin/auth/logout', { method: 'POST', credentials: 'same-origin' }).catch(error => {
     console.warn('Logout failed:', error);
   });
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
+  authStatus.authenticated = false;
   setAuthInputs();
-  setAuthMode(sessionAuthenticated ? 'session' : 'login');
+  setAuthMode('login');
 }
 
 restoreLogin();
 
 // ── GitHub API ────────────────────────────────────
 async function ghAPI(path, method = 'GET', body = null) {
-  const opts = {
-    method,
-    headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(`https://api.github.com/repos/${REPO}/${path}`, opts);
+  const res = await fetch('/api/admin/github', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, method, body }),
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `HTTP ${res.status}`);
+    throw new Error(err.message || err.error || `HTTP ${res.status}`);
   }
   return res.status === 204 ? null : res.json();
 }
