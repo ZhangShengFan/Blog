@@ -386,7 +386,6 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
           <div class="form-group"><label class="form-label">描述</label><textarea class="form-input form-textarea" id="s-description" placeholder="站点 SEO 描述"></textarea></div>
           <div class="form-group"><label class="form-label">站点域名</label><input class="form-input" id="s-url" placeholder="https://blog-buh.pages.dev"></div>
           <div class="form-group"><label class="form-label">页脚文字</label><input class="form-input" id="s-footerText" placeholder="©2026 ZSFan 的 Blog"></div>
-          <div class="form-group"><label class="form-label">市场信息前缀</label><input class="form-input" id="s-runtimePrefix" placeholder="留空则只显示时间"></div>
           <div class="helper-text">留空后，状态卡片只显示时间本体，不显示前缀。</div>
           <div class="form-group"><label class="form-label">建站日期</label><input class="form-input" id="s-runtimeStartDate" placeholder="2026-01-01"></div>
           <div class="form-group"><label class="form-label">显示小时</label><select class="form-input" id="s-runtimeShowHours"><option value="true">显示</option><option value="false">隐藏</option></select></div>
@@ -1129,7 +1128,6 @@ function parseSiteConfig(source) {
     logo: readConfigValue(source, /logo:\s*'([^']*)'/),
     seoImage: readConfigValue(source, /seoImage:\s*'([^']*)'/),
     footerText: readConfigValue(source, /footerText:\s*'([^']*)'/),
-    runtimePrefix: readConfigValue(source, /runtimePrefix:\s*'([^']*)'/),
     runtimeStartDate: readConfigValue(source, /runtimeStartDate:\s*'([^']*)'/),
     runtimeShowHours: readConfigValue(source, /runtimeShowHours:\s*(true|false)/),
     runtimeShowMinutes: readConfigValue(source, /runtimeShowMinutes:\s*(true|false)/),
@@ -1163,7 +1161,6 @@ function renderSettingsForm() {
     's-description': cfg.description,
     's-url': cfg.url,
     's-footerText': cfg.footerText,
-    's-runtimePrefix': cfg.runtimePrefix,
     's-runtimeStartDate': cfg.runtimeStartDate,
     's-runtimeShowHours': cfg.runtimeShowHours || 'true',
     's-runtimeShowMinutes': cfg.runtimeShowMinutes || 'true',
@@ -1205,7 +1202,6 @@ async function saveSiteSettings() {
     description: document.getElementById('s-description').value.trim(),
     url: document.getElementById('s-url').value.trim(),
     footerText: document.getElementById('s-footerText').value.trim(),
-    runtimePrefix: document.getElementById('s-runtimePrefix').value.trim(),
     runtimeStartDate: document.getElementById('s-runtimeStartDate').value.trim(),
     runtimeShowHours: document.getElementById('s-runtimeShowHours').value === 'true',
     runtimeShowMinutes: document.getElementById('s-runtimeShowMinutes').value === 'true',
