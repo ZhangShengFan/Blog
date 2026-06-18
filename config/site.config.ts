@@ -7,6 +7,13 @@ export const siteConfig = {
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
+  runtimeStartDate: '2026-01-01',
+  runtimePrefix: '本站已运行',
+  runtimeSuffix: '',
+  runtimeInvalidText: '运行中',
+  runtimeShowHours: true,
+  runtimeShowMinutes: true,
+  runtimeShowSeconds: true,
   url: 'https://blog.zsfan8986.dpdns.org',
   social: {
     github: 'https://github.com/ZhangShengFan/',
