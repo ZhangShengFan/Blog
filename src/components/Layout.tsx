@@ -821,9 +821,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       if (siteConfig.runtimeShowMinutes) parts.push(`${minutes}分钟`);
       if (siteConfig.runtimeShowSeconds) parts.push(`${seconds}秒`);
 
-      const prefix = siteConfig.runtimePrefix || '本站已运行';
-      const suffix = siteConfig.runtimeSuffix ? ` ${siteConfig.runtimeSuffix}` : '';
-      setRuntimeText(`${prefix} ${parts.join(' ')}${suffix}`.trim());
+      setRuntimeText(parts.join(' '));
     };
 
     updateRuntime();
