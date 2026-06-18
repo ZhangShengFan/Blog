@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
 .tab{padding:5px 12px;border-radius:6px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-weight:500;transition:background .15s,color .15s}
 .tab.active,.tab:hover{background:var(--bg);color:var(--text)}
 .topbar-right{display:flex;align-items:center;gap:8px}
-.theme-toggle{min-width:92px}
+.theme-toggle{min-width:108px}
 .theme-toggle .theme-toggle-icon{font-size:14px;line-height:1}
 .theme-toggle .theme-toggle-label{font-size:12px}
 
@@ -174,7 +174,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
       </nav>
     </div>
     <div class="topbar-right">
-      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn"><span class="theme-toggle-icon">🌞</span><span class="theme-toggle-label">浅色</span></button>
+      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn"><span class="theme-toggle-icon">💻</span><span class="theme-toggle-label">跟随系统</span></button>
       <button class="btn btn-sm btn-ghost" onclick="logout()">退出</button>
     </div>
   </div>
@@ -413,16 +413,20 @@ let easyMDE = null;
 let currentTab = 'posts';
 
 const ADMIN_THEME_KEY = 'admin-theme';
-let currentTheme = 'light';
+let currentTheme = 'system';
+
+function resolveSystemTheme() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 function getPreferredTheme() {
   try {
     const saved = localStorage.getItem(ADMIN_THEME_KEY);
-    if (saved === 'light' || saved === 'dark') return saved;
+    if (saved === 'system' || saved === 'light' || saved === 'dark') return saved;
   } catch (error) {
     console.warn('Failed to read theme:', error);
   }
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return 'system';
 }
 
 function getThemeMetaTag() {
@@ -434,16 +438,21 @@ function updateThemeToggle() {
   if (!btn) return;
   const icon = btn.querySelector('.theme-toggle-icon');
   const label = btn.querySelector('.theme-toggle-label');
-  const isDark = currentTheme === 'dark';
-  if (icon) icon.textContent = isDark ? '🌙' : '🌞';
-  if (label) label.textContent = isDark ? '暗色' : '浅色';
+  if (currentTheme === 'system') {
+    if (icon) icon.textContent = '💻';
+    if (label) label.textContent = '跟随系统';
+    return;
+  }
+  if (icon) icon.textContent = currentTheme === 'dark' ? '🌙' : '🌞';
+  if (label) label.textContent = currentTheme === 'dark' ? '暗色' : '浅色';
 }
 
 function applyTheme(theme, persist = true) {
-  currentTheme = theme === 'dark' ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', currentTheme);
+  currentTheme = theme === 'dark' || theme === 'light' ? theme : 'system';
+  const resolvedTheme = currentTheme === 'system' ? resolveSystemTheme() : currentTheme;
+  document.documentElement.setAttribute('data-theme', resolvedTheme);
   const meta = getThemeMetaTag();
-  if (meta) meta.setAttribute('content', currentTheme === 'dark' ? '#111110' : '#f5f5f4');
+  if (meta) meta.setAttribute('content', resolvedTheme === 'dark' ? '#111110' : '#f5f5f4');
   updateThemeToggle();
   if (persist) {
     try {
@@ -455,7 +464,8 @@ function applyTheme(theme, persist = true) {
 }
 
 function toggleTheme() {
-  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  const nextTheme = currentTheme === 'system' ? 'light' : currentTheme === 'light' ? 'dark' : 'system';
+  applyTheme(nextTheme);
 }
 
 function initTheme() {
@@ -467,15 +477,9 @@ function initTheme() {
   }
   if (window.matchMedia) {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = event => {
-      let saved = null;
-      try {
-        saved = localStorage.getItem(ADMIN_THEME_KEY);
-      } catch (error) {
-        console.warn('Failed to read theme during change:', error);
-      }
-      if (saved !== 'light' && saved !== 'dark') {
-        applyTheme(event.matches ? 'dark' : 'light', false);
+    const handleChange = () => {
+      if (currentTheme === 'system') {
+        applyTheme('system', false);
       }
     };
     if (typeof media.addEventListener === 'function') media.addEventListener('change', handleChange);
