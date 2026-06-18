@@ -60,9 +60,14 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
 .tab{padding:5px 12px;border-radius:6px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-weight:500;transition:background .15s,color .15s}
 .tab.active,.tab:hover{background:var(--bg);color:var(--text)}
 .topbar-right{display:flex;align-items:center;gap:8px}
-.theme-toggle{min-width:108px}
-.theme-toggle .theme-toggle-icon{font-size:14px;line-height:1}
-.theme-toggle .theme-toggle-label{font-size:12px}
+.theme-toggle{position:relative;border:none!important;border-radius:999px!important;background:var(--surface-2)!important;color:var(--text)!important;width:40px;height:40px;padding:0!important;min-width:40px;box-shadow:none;transition:all .3s ease}
+.theme-toggle:hover{background:var(--surface)!important;box-shadow:0 0 0 2px rgba(24,24,27,.12)}
+[data-theme="dark"] .theme-toggle{background:#27272a!important;color:#fbbf24!important}
+[data-theme="dark"] .theme-toggle:hover{box-shadow:0 0 0 2px rgba(244,244,245,.16)}
+.theme-toggle .theme-toggle-icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px}
+.theme-toggle .theme-toggle-icon{display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;transition:transform .2s ease,opacity .2s ease}
+.theme-toggle .theme-toggle-tooltip{pointer-events:none;position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;border-radius:6px;background:#111827;color:#fff;padding:5px 8px;font-size:12px;line-height:1.2;opacity:0;transition:opacity .2s ease;z-index:20}
+.theme-toggle:hover .theme-toggle-tooltip{opacity:1}
 
 /* ── Panels ── */
 .panel{display:none;flex:1;padding:24px;max-width:1100px;margin:0 auto;width:100%}
@@ -174,7 +179,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
       </nav>
     </div>
     <div class="topbar-right">
-      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn"><span class="theme-toggle-icon">💻</span><span class="theme-toggle-label">跟随系统</span></button>
+      <button class="btn btn-sm btn-ghost theme-toggle" type="button" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="切换主题"><span class="theme-toggle-icon-wrap"><span class="theme-toggle-icon">💻</span></span><span class="theme-toggle-tooltip">跟随系统</span></button>
       <button class="btn btn-sm btn-ghost" onclick="logout()">退出</button>
     </div>
   </div>
@@ -437,14 +442,14 @@ function updateThemeToggle() {
   const btn = document.getElementById('theme-toggle-btn');
   if (!btn) return;
   const icon = btn.querySelector('.theme-toggle-icon');
-  const label = btn.querySelector('.theme-toggle-label');
+  const tooltip = btn.querySelector('.theme-toggle-tooltip');
   if (currentTheme === 'system') {
     if (icon) icon.textContent = '💻';
-    if (label) label.textContent = '跟随系统';
+    if (tooltip) tooltip.textContent = '跟随系统';
     return;
   }
   if (icon) icon.textContent = currentTheme === 'dark' ? '🌙' : '🌞';
-  if (label) label.textContent = currentTheme === 'dark' ? '暗色' : '浅色';
+  if (tooltip) tooltip.textContent = currentTheme === 'dark' ? '暗色' : '浅色';
 }
 
 function applyTheme(theme, persist = true) {
