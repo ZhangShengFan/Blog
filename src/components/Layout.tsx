@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sun, Moon, Github, Menu, X, Search, Mail, Heart, Zap, Coffee, Code2, Layers, GitBranch, Box, Monitor, Rss, Image, BookOpen, Archive, Tag, BarChart3, Users, Info, Clock3 } from 'lucide-react';
+import { Sun, Moon, Github, Menu, X, Search, Mail, Heart, Zap, Coffee, Code2, Layers, GitBranch, Box, Monitor, Rss, Image, BookOpen, Archive, Tag, BarChart3, Users, Info } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { preloadPage } from '@/utils/preload';
 import { siteConfig } from '@config/site.config';
@@ -792,21 +792,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 
 const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
-  const [runtimeText, setRuntimeText] = useState<string>('');
-  const runtimePrefix = '本站已运行';
-
-  useEffect(() => {
-    if (isPostPage) {
-      return;
-    }
-
-    const startedAt = new Date(`${siteConfig.runtimeStartDate}T00:00:00`);
-
-    const updateRuntime = () => {
-      const now = new Date();
-      const diff = now.getTime() - startedAt.getTime();
-
-      if (Number.isNaN(diff) || diff < 0) {
+|| diff < 0) {
         setRuntimeText(`${runtimePrefix} 运行中`);
         return;
       }
@@ -929,12 +915,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
                       </span>
                     </motion.div>
                   )}
-                  {runtimeText && (
-                    <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
-                      <Clock3 size={13} className="text-emerald-600 dark:text-emerald-400" />
-                      <span>{runtimeText.replace(/^本站已运行\s*/, '')}</span>
-                    </motion.div>
-                  )}
+                  
                   <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.05, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
                     <Coffee size={13} className="text-amber-700 dark:text-amber-600" />
                     <span>By ZSFan</span>
