@@ -793,7 +793,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
   const [runtimeText, setRuntimeText] = useState<string>('');
-  const runtimePrefix = siteConfig.runtimePrefix || '本站运行时间';
+  const runtimePrefix = siteConfig.runtimePrefix || '本站市场信息';
 
   useEffect(() => {
     if (isPostPage) {
