@@ -932,7 +932,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
                   {runtimeText && (
                     <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
                       <Clock3 size={13} className="text-emerald-600 dark:text-emerald-400" />
-                      <span>网站已运行 {runtimeText}</span>
+                      <span>{runtimeText.replace(/^本站已运行\s*/, '')}</span>
                     </motion.div>
                   )}
                   <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.05, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
