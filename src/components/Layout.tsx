@@ -806,7 +806,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       const diff = now.getTime() - startedAt.getTime();
 
       if (Number.isNaN(diff) || diff < 0) {
-        setRuntimeText(siteConfig.runtimeInvalidText || '运行中');
+        setRuntimeText('运行中');
         return;
       }
 

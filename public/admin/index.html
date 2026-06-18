@@ -342,7 +342,6 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
           <div class="form-group"><label class="form-label">站点域名</label><input class="form-input" id="s-url" placeholder="https://blog-buh.pages.dev"></div>
           <div class="form-group"><label class="form-label">页脚文字</label><input class="form-input" id="s-footerText" placeholder="©2026 ZSFan 的 Blog"></div>
           <div class="form-group"><label class="form-label">建站日期</label><input class="form-input" id="s-runtimeStartDate" placeholder="2026-01-01"></div>
-          <div class="form-group"><label class="form-label">异常文案</label><input class="form-input" id="s-runtimeInvalidText" placeholder="运行中"></div>
           <div class="form-group"><label class="form-label">显示小时</label><select class="form-input" id="s-runtimeShowHours"><option value="true">显示</option><option value="false">隐藏</option></select></div>
           <div class="form-group"><label class="form-label">显示分钟</label><select class="form-input" id="s-runtimeShowMinutes"><option value="true">显示</option><option value="false">隐藏</option></select></div>
           <div class="form-group"><label class="form-label">显示秒数</label><select class="form-input" id="s-runtimeShowSeconds"><option value="true">显示</option><option value="false">隐藏</option></select></div>
@@ -1087,7 +1086,6 @@ function parseSiteConfig(source) {
     seoImage: readConfigValue(source, /seoImage:\s*'([^']*)'/),
     footerText: readConfigValue(source, /footerText:\s*'([^']*)'/),
     runtimeStartDate: readConfigValue(source, /runtimeStartDate:\s*'([^']*)'/),
-    runtimeInvalidText: readConfigValue(source, /runtimeInvalidText:\s*'([^']*)'/),
     runtimeShowHours: readConfigValue(source, /runtimeShowHours:\s*(true|false)/),
     runtimeShowMinutes: readConfigValue(source, /runtimeShowMinutes:\s*(true|false)/),
     runtimeShowSeconds: readConfigValue(source, /runtimeShowSeconds:\s*(true|false)/),
@@ -1121,7 +1119,6 @@ function renderSettingsForm() {
     's-url': cfg.url,
     's-footerText': cfg.footerText,
     's-runtimeStartDate': cfg.runtimeStartDate,
-    's-runtimeInvalidText': cfg.runtimeInvalidText,
     's-runtimeShowHours': cfg.runtimeShowHours || 'true',
     's-runtimeShowMinutes': cfg.runtimeShowMinutes || 'true',
     's-runtimeShowSeconds': cfg.runtimeShowSeconds || 'true',
@@ -1163,7 +1160,6 @@ async function saveSiteSettings() {
     url: document.getElementById('s-url').value.trim(),
     footerText: document.getElementById('s-footerText').value.trim(),
     runtimeStartDate: document.getElementById('s-runtimeStartDate').value.trim(),
-    runtimeInvalidText: document.getElementById('s-runtimeInvalidText').value.trim(),
     runtimeShowHours: document.getElementById('s-runtimeShowHours').value === 'true',
     runtimeShowMinutes: document.getElementById('s-runtimeShowMinutes').value === 'true',
     runtimeShowSeconds: document.getElementById('s-runtimeShowSeconds').value === 'true',
@@ -1203,7 +1199,6 @@ export const siteConfig = {
   seoImage: '${escTS(data.seoImage || '/logo.png')}',
   footerText: '${escTS(data.footerText)}',
   runtimeStartDate: '${escTS(data.runtimeStartDate || '2026-01-01')}',
-  runtimeInvalidText: '${escTS(data.runtimeInvalidText || '运行中')}',
   runtimeShowHours: ${'${data.runtimeShowHours}'},
   runtimeShowMinutes: ${'${data.runtimeShowMinutes}'},
   runtimeShowSeconds: ${'${data.runtimeShowSeconds}'},

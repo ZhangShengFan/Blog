@@ -8,7 +8,6 @@ export const siteConfig = {
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
   runtimeStartDate: '2026-01-01',
-  runtimeInvalidText: '运行中',
   runtimeShowHours: true,
   runtimeShowMinutes: true,
   runtimeShowSeconds: true,
