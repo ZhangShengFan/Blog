@@ -793,7 +793,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
   const [runtimeText, setRuntimeText] = useState<string>('');
-  const runtimePrefix = siteConfig.runtimePrefix || '本站市场信息';
+  const runtimePrefix = siteConfig.runtimePrefix?.trim() || '';
 
   useEffect(() => {
     if (isPostPage) {
@@ -807,7 +807,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       const diff = now.getTime() - startedAt.getTime();
 
       if (Number.isNaN(diff) || diff < 0) {
-        setRuntimeText(`${runtimePrefix} 运行中`);
+        setRuntimeText(runtimePrefix ? `${runtimePrefix} 运行中` : '运行中');
         return;
       }
 
@@ -823,7 +823,7 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
       if (siteConfig.runtimeShowMinutes) parts.push(`${minutes}分钟`);
       if (siteConfig.runtimeShowSeconds) parts.push(`${seconds}秒`);
 
-      setRuntimeText(`${runtimePrefix} ${parts.join(' ')}`.trim());
+      setRuntimeText(runtimePrefix ? `${runtimePrefix} ${parts.join(' ')}`.trim() : parts.join(' '));
     };
 
     updateRuntime();
