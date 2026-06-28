@@ -976,6 +976,9 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
 
         <div className="flex w-full flex-col items-center justify-between border-t border-zinc-200/50 pt-8 text-center text-xs font-medium text-zinc-700 dark:border-zinc-800/50 dark:text-zinc-300 md:flex-row md:text-left">
           <p>{siteConfig.footerText} · {siteConfig.author.name}</p>
+          {runtimeText && (
+            <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">{runtimeText}</p>
+          )}
           <div className="mt-4 flex flex-col items-center gap-3 md:mt-0 md:flex-row md:gap-6">
             <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
               {siteConfig.beian.text}
