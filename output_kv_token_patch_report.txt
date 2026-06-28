@@ -1,6 +1,0 @@
-status_hasToken=True
-proxy_endpoint=True
-frontend_hint_id=True
-frontend_proxy_call=True
-no_local_token_key=True
-restore_direct_app=True
