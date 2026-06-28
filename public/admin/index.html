@@ -64,14 +64,14 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
 
 /* ── App Shell ── */
 #app{display:none;flex-direction:column;min-height:100dvh}
-.topbar{background:color-mix(in srgb,var(--surface) 88%,transparent);border-bottom:1px solid color-mix(in srgb,var(--border) 82%,transparent);padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.topbar{background:color-mix(in srgb,var(--surface) 88%,transparent);border-bottom:1px solid color-mix(in srgb,var(--border) 82%,transparent);padding:0 20px;min-height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);flex-wrap:wrap;gap:8px}
 .topbar-left{display:flex;align-items:center;gap:18px}
 .logo{display:inline-flex;align-items:center;height:40px;padding:0 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);font-size:15px;font-weight:600;letter-spacing:-.01em}
 .tab-nav{display:flex;align-items:center;gap:8px;padding:4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border)}
 .tab{padding:8px 14px;border-radius:999px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-weight:600;transition:background .2s ease,color .2s ease,transform .2s ease}
 .tab:hover{background:var(--surface);color:var(--text);transform:translateY(-1px)}
 .tab.active{background:var(--surface);color:var(--text);box-shadow:0 8px 24px rgba(15,23,42,.08)}
-.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto}
 .theme-toggle{position:relative;width:48px;height:48px;border:none;border-radius:50%;background:var(--theme-toggle-bg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease,background-color .25s ease;overflow:visible;padding:0}
 .theme-toggle:hover{transform:translateY(-1px) scale(1.02);box-shadow:0 10px 24px rgba(0,0,0,.08)}
 .theme-toggle:active{transform:translateY(0) scale(.98)}
