@@ -1,4 +1,11 @@
 {
-  "postCategories": ["教程", "技术", "随笔", "分享", "其他"],
+  "postCategories": [
+    "教程",
+    "技术",
+    "随笔",
+    "分享",
+    "其他",
+    "Android"
+  ],
   "fallbackCategory": "其他"
 }
