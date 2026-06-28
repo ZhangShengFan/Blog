@@ -3,7 +3,7 @@ id: viewmodel-stateflow-migration
 title: "ViewModel + StateFlow 最佳实践：替代 LiveData 的完整迁移指南"
 excerpt: 从原理到实践，手把手带你把项目中的 LiveData 全面迁移到 StateFlow + SharedFlow，附完整代码和踩坑总结。
 date: 2026-06-29
-category: Android
+category: 技术
 tags:
   - Android
   - Kotlin
