@@ -26,6 +26,26 @@
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     </noscript>
+
+  <script>
+    (function () {
+      var original = document.title;
+      var away = 'w(°Д°)w 不要走！再看看嘛~';
+      var back  = '♪(^▽^*) 欢迎回来！';
+      var backTimer = null;
+      document.addEventListener('visibilitychange', function () {
+        clearTimeout(backTimer);
+        if (document.hidden) {
+          document.title = away;
+        } else {
+          document.title = back;
+          backTimer = setTimeout(function () {
+            document.title = original;
+          }, 3000);
+        }
+      });
+    })();
+  </script>
 </head>
   <body class="bg-paper text-ink dark:bg-void dark:text-gray-200 overflow-x-hidden">
     <div class="bg-noise"></div>
