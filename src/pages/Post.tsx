@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { easeOut } from '@/utils/motion';
 import DOMPurify from 'dompurify';
+import Giscus from '@giscus/react';
 
 import { ArrowLeft, ArrowRight, Clock, Calendar, ChevronRight, Shield, Share2, Copy, Check, Users, ExternalLink, FileText, History } from 'lucide-react';
 import { getPostById, getPosts } from '@/services/posts';
@@ -928,6 +929,35 @@ export const Post = () => {
                 <span>此文章有问题？帮助改进！</span>
               </a>
             </div>
+
+
+            {/* 评论区 */}
+            <section aria-labelledby="comments-title" className="mt-12 border-t border-zinc-200 pt-10 dark:border-zinc-800 md:mt-16 md:pt-12">
+              <div className="mb-6 flex flex-col gap-2">
+                <span className="text-xs font-bold uppercase tracking-[0.24em] text-zinc-400 dark:text-zinc-500">Discussion</span>
+                <h2 id="comments-title" className="font-serif text-2xl font-bold text-ink dark:text-white md:text-3xl">评论区</h2>
+                <p className="max-w-2xl text-sm leading-7 text-zinc-600 dark:text-zinc-400">
+                  评论由 GitHub Discussions 承载，需要登录 GitHub 账号参与讨论。每篇文章的评论会自动与文章路径绑定。
+                </p>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white/80 p-3 shadow-sm shadow-zinc-200/40 backdrop-blur dark:border-white/10 dark:bg-zinc-950/50 dark:shadow-none md:p-5">
+                <Giscus
+                  id="comments"
+                  repo="ZhangShengFan/Blog"
+                  repoId="R_kgDOS6HulA"
+                  category="Announcements"
+                  categoryId="DIC_kwDOS6HulM4DAFGu"
+                  mapping="pathname"
+                  strict="0"
+                  reactionsEnabled="1"
+                  emitMetadata="0"
+                  inputPosition="top"
+                  theme={document.documentElement.getAttribute('data-theme') === 'dark' || (document.documentElement.getAttribute('data-theme') === null && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark_dimmed' : 'light'}
+                  lang="zh-CN"
+                  loading="lazy"
+                />
+              </div>
+            </section>
 
             {/* 上一篇 / 下一篇导航 */}
             <nav aria-label="文章导航" className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800 md:mt-16 md:pt-10">
