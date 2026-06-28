@@ -70,3 +70,5 @@ AGENTS.md
 .vscode/
 .codebuddy/
 CODEBUDDY.md
+output/
+output_*.txt
