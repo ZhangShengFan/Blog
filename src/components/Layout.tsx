@@ -792,7 +792,21 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 
 const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolean; onOpenVisitorInfo: () => void }) => {
   const [loadTime, setLoadTime] = useState<string>('');
-|| diff < 0) {
+  const [runtimeText, setRuntimeText] = useState<string>('');
+  const runtimePrefix = '本站已运行';
+
+  useEffect(() => {
+    if (isPostPage) {
+      return;
+    }
+
+    const startedAt = new Date(`${siteConfig.runtimeStartDate}T00:00:00`);
+
+    const updateRuntime = () => {
+      const now = new Date();
+      const diff = now.getTime() - startedAt.getTime();
+
+      if (Number.isNaN(diff) || diff < 0) {
         setRuntimeText(`${runtimePrefix} 运行中`);
         return;
       }
