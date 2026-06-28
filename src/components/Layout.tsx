@@ -867,12 +867,6 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
                 <div>
                   <span className="font-serif text-xl font-bold tracking-tight text-ink dark:text-white">{siteConfig.title}</span>
                   <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{siteConfig.subtitle}</p>
-                {runtimeText ? (
-                  <p className="mt-2 inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    <Clock3 size={14} />
-                    <span>{runtimeText}</span>
-                  </p>
-                ) : null}
                 </div>
                 <p className="text-center text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-left">{siteConfig.description}</p>
                 <div className="flex items-center gap-4 pt-2">
