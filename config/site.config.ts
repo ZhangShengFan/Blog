@@ -8,10 +8,9 @@ export const siteConfig = {
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
   runtimeStartDate: '2026-01-01',
-  runtimeStartDate: '2026-01-01',
-  runtimeShowHours: ${data.runtimeShowHours},
-  runtimeShowMinutes: ${data.runtimeShowMinutes},
-  runtimeShowSeconds: ${data.runtimeShowSeconds},
+  runtimeShowHours: true,
+  runtimeShowMinutes: true,
+  runtimeShowSeconds: true,
   url: 'https://blog.zsfan.top',
   social: {
     github: 'https://github.com/ZhangShengFan/',
