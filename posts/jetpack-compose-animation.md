@@ -3,7 +3,7 @@ id: jetpack-compose-animation
 title: "Jetpack Compose 动画实战：从 animateFloatAsState 到自定义 Transition"
 excerpt: 从最简单的状态驱动动画出发，逐步深入到 Transition、AnimatedContent、自定义动画规格，附完整代码和注释，带你掌握 Compose 动画体系。
 date: 2026-06-29
-category: Android
+category: 技术
 tags:
   - Android
   - Jetpack Compose
