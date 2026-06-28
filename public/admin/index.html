@@ -179,7 +179,7 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
 .EasyMDEContainer .editor-toolbar button{color:var(--muted)!important}
 .EasyMDEContainer .editor-toolbar button:hover,.EasyMDEContainer .editor-toolbar button.active{background:var(--bg)!important;border-color:var(--border)!important}
 .EasyMDEContainer .editor-statusbar{color:var(--muted);font-size:11px}
-.cover-preview{display:none;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2)}
+.cover-preview{display:block;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2)}
 .cover-preview.show{display:block}
 .cover-preview img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 .helper-text{font-size:11px;color:var(--muted);line-height:1.5}
@@ -278,7 +278,7 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
       <div class="editor-main">
         <div class="form-group">
           <label class="form-label">文章标题</label>
-          <input type="text" class="form-input" id="f-title" placeholder="输入文章标题">
+          <input type="text" class="form-input" id="f-title" placeholder="输入文章标题" oninput="autoGenerateId(this.value)">
         </div>
         <div class="form-group">
           <label class="form-label">正文（Markdown）</label>
@@ -290,7 +290,7 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
           <div class="sidebar-card-title">基本信息</div>
           <div class="form-group">
             <label class="form-label">文章 ID</label>
-            <input type="text" class="form-input" id="f-id" placeholder="可以是中文，例如：我的文章">
+            <input type="text" class="form-input" id="f-id" placeholder="标题输入后自动生成，也可手动修改" oninput="this.dataset.userEdited='true'" onfocus="if(!this.value)this.dataset.userEdited='false'">
           </div>
           <div class="form-group">
             <label class="form-label">摘要</label>
@@ -327,7 +327,11 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
             <div class="helper-text">支持站内相对路径或完整图片 URL</div>
           </div>
           <div class="cover-preview" id="cover-preview">
-            <img id="cover-preview-img" src="" alt="封面预览">
+            <img id="cover-preview-img" src="" alt="封面预览" style="border-radius:10px;display:none;">
+            <div id="cover-preview-placeholder" style="display:flex;align-items:center;justify-content:center;height:100px;color:var(--muted);font-size:12px;gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              输入封面 URL 后预览
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">置顶排序（可选）</label>
@@ -850,6 +854,7 @@ async function openEditor(idx) {
   document.getElementById('f-updated').value = '';
   document.getElementById('f-title').value = '';
   document.getElementById('f-id').value = '';
+  document.getElementById('f-id').dataset.userEdited = 'false';
   document.getElementById('f-excerpt').value = '';
   document.getElementById('f-tags').value = '';
   document.getElementById('f-cover').value = '';
@@ -883,6 +888,7 @@ async function openEditor(idx) {
         };
         document.getElementById('f-title').value = get('title');
         document.getElementById('f-id').value = get('id');
+        document.getElementById('f-id').dataset.userEdited = 'true';
         document.getElementById('f-excerpt').value = get('excerpt');
         document.getElementById('f-date').value = get('date');
         document.getElementById('f-updated').value = get('updatedAt');
@@ -1074,19 +1080,36 @@ function getPreviewPostUrl() {
   return `${getSiteBaseUrl()}/post/${encodeURIComponent(id)}`;
 }
 
+function pinyinSlug(str) {
+  const map = {'的':'de','了':'le','和':'he','是':'shi','在':'zai','有':'you','这':'zhe','中':'zhong','大':'da','为':'wei','上':'shang','个':'ge','国':'guo','以':'yi','要':'yao','就':'jiu','出':'chu','也':'ye','你':'ni','生':'sheng','到':'dao','时':'shi','会':'hui','作':'zuo','来':'lai','用':'yong','们':'men','说':'shuo','主':'zhu','发':'fa','开':'kai','地':'di','年':'nian','度':'du','方':'fang','当':'dang','后':'hou','学':'xue','样':'yang','使':'shi','间':'jian','工':'gong','过':'guo','与':'yu','前':'qian','能':'neng','所':'suo','对':'dui','从':'cong','如':'ru','其':'qi','些':'xie','第':'di','变':'bian','而':'er','本':'ben','不':'bu','入':'ru','行':'xing','关':'guan','解':'jie','实':'shi','面':'mian','动':'dong','全':'quan','型':'xing','最':'zui','新':'xin','技':'ji','术':'shu','理':'li','原':'yuan','系':'xi','统':'tong','完':'wan','整':'zheng','迁':'qian','移':'yi','指':'zhi','南':'nan','战':'zhan','自':'zi','定':'ding','义':'yi','附':'fu','代':'dai','码':'ma','注':'zhu','释':'shi','详':'xiang','细':'xi','我':'wo','他':'ta'};
+  return str.split('').map(c => {
+    if (/[一-龥]/.test(c)) return (map[c] || 'x');
+    if (/[a-zA-Z0-9]/.test(c)) return c.toLowerCase();
+    return '-';
+  }).join('').replace(/-+/g, '-').replace(/^-|-$/g, '').substring(0, 60);
+}
+function autoGenerateId(title) {
+  const idEl = document.getElementById('f-id');
+  if (!idEl || idEl.dataset.userEdited === 'true') return;
+  if (!title.trim()) { idEl.value = ''; return; }
+  idEl.value = pinyinSlug(title.trim());
+}
 function updateCoverPreview() {
   const input = document.getElementById('f-cover');
   const wrap = document.getElementById('cover-preview');
   const img = document.getElementById('cover-preview-img');
   if (!input || !wrap || !img) return;
   const value = input.value.trim();
+  const placeholder = document.getElementById('cover-preview-placeholder');
   if (!value) {
-    wrap.classList.remove('show');
+    if (placeholder) placeholder.style.display = 'flex';
+    img.style.display = 'none';
     img.removeAttribute('src');
     return;
   }
+  if (placeholder) placeholder.style.display = 'none';
   const src = /^https?:\/\//i.test(value) ? value : `${getSiteBaseUrl()}${value.startsWith('/') ? '' : '/'}${value}`;
-  img.onload = () => wrap.classList.add('show');
+  img.onload = () => { img.style.display = 'block'; wrap.classList.add('show'); };
   img.onerror = () => {
     wrap.classList.remove('show');
     showToast('封面图加载失败，请检查 URL', 'error');

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Compass } from 'lucide-react';
+import { ArrowLeft, Home, Search } from 'lucide-react';
 
 interface NotFoundStateProps {
   title: string;
@@ -10,6 +10,15 @@ interface NotFoundStateProps {
   debugLabel?: string;
 }
 
+const MESSAGES = [
+  { emoji: '🔭', text: '这个页面去宇宙旅行了，还没回来' },
+  { emoji: '🌊', text: '这个页面被海浪卷走了' },
+  { emoji: '🦕', text: '这个页面比恐龙消失得还彻底' },
+  { emoji: '☁️', text: '这个页面飘到云端找不到了' },
+  { emoji: '🐉', text: '这个页面被龙叼走了' },
+  { emoji: '🚀', text: '这个页面已经飞出太阳系' },
+];
+
 export const NotFoundState: React.FC<NotFoundStateProps> = React.memo(({
   title,
   description,
@@ -17,49 +26,72 @@ export const NotFoundState: React.FC<NotFoundStateProps> = React.memo(({
   backLabel = '返回首页',
   debugLabel
 }) => {
+  const [msg] = useState(() => MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
+  const [dots, setDots] = useState('.');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDots(d => d.length >= 3 ? '.' : d + '.');
+    }, 500);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-      <div className="mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center px-4 py-10">
-        <div className="relative w-full overflow-hidden rounded-[2rem] border border-zinc-200/80 bg-white/75 p-8 shadow-[0_24px_80px_-36px_rgba(24,24,27,0.28)] backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-950/70 md:p-12">
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute left-[-8%] top-[-12%] h-40 w-40 rounded-full bg-zinc-200/50 blur-3xl dark:bg-zinc-800/50" />
-            <div className="absolute bottom-[-18%] right-[-6%] h-48 w-48 rounded-full bg-zinc-200/70 blur-3xl dark:bg-zinc-800/60" />
-          </div>
-
-          <div className="relative">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-100 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.28em] text-zinc-700 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-300">
-              <Compass size={14} className="animate-[spin_4s_linear_infinite]" />
-              Page Missing
-            </div>
-
-            <div className="mb-5 font-serif text-7xl font-black leading-none bg-gradient-to-br from-zinc-300 to-zinc-200 bg-clip-text text-transparent dark:from-zinc-700 dark:to-zinc-800 md:text-8xl">
-              404
-            </div>
-
-            <h1 className="mb-4 font-serif text-3xl font-bold text-ink dark:text-white md:text-4xl">
-              {title}
-            </h1>
-
-            <p className="max-w-xl text-sm leading-7 text-zinc-700 dark:text-zinc-300 md:text-base">
-              {description}
-            </p>
-
-            {debugLabel && (
-              <div className="mt-6 inline-flex max-w-full items-center rounded-2xl border border-zinc-200/80 bg-zinc-50/85 px-4 py-3 font-mono text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-300">
-                {debugLabel}
-              </div>
-            )}
-
-            <div className="mt-8">
-              <Link
-                to={backTo}
-                className="inline-flex items-center rounded-full bg-ink px-6 py-3 text-sm font-bold tracking-[0.2em] text-white transition-transform hover:scale-[1.02] dark:bg-white dark:text-ink"
-              >
-                <ArrowLeft size={16} className="mr-2" />
-                {backLabel}
-              </Link>
-            </div>
-          </div>
-        </div>
+    <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="relative mb-6 select-none">
+        <span className="font-serif text-[9rem] font-black leading-none text-zinc-100 dark:text-zinc-800 md:text-[12rem]">
+          404
+        </span>
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl animate-bounce md:text-6xl">
+          {msg.emoji}
+        </span>
       </div>
+
+      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-xs font-semibold text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-zinc-400 opacity-75 dark:bg-zinc-600" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600" />
+        </span>
+        正在全力搜索{dots}
+      </div>
+
+      <h1 className="mb-3 font-serif text-2xl font-bold text-ink dark:text-white md:text-3xl">
+        {msg.text}
+      </h1>
+
+      <p className="mb-2 max-w-md text-sm leading-7 text-zinc-500 dark:text-zinc-400">
+        {description}
+      </p>
+
+      {debugLabel && (
+        <div className="mb-8 inline-flex max-w-full items-center rounded-xl border border-zinc-200/80 bg-zinc-50 px-4 py-2 font-mono text-xs text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-500">
+          {debugLabel}
+        </div>
+      )}
+
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link
+          to={backTo}
+          className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-bold text-white transition-all hover:scale-[1.03] hover:opacity-90 dark:bg-white dark:text-ink"
+        >
+          <Home size={15} />
+          {backLabel}
+        </Link>
+        <button
+          onClick={() => window.history.back()}
+          className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-6 py-2.5 text-sm font-bold text-zinc-700 transition-all hover:scale-[1.03] hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600"
+        >
+          <ArrowLeft size={15} />
+          上一页
+        </button>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-6 py-2.5 text-sm font-bold text-zinc-700 transition-all hover:scale-[1.03] hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600"
+        >
+          <Search size={15} />
+          搜索文章
+        </Link>
+      </div>
+    </div>
   );
 });
