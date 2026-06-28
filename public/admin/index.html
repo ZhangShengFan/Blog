@@ -32,8 +32,9 @@
 }}
 html{font-family:'Inter',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;color-scheme:light dark}
 body{background:var(--bg);color:var(--text);min-height:100dvh;transition:background .2s,color .2s}
-button,input,select,textarea{-webkit-appearance:none;appearance:none;outline:none;box-shadow:none;-webkit-tap-highlight-color:transparent;tap-highlight-color:transparent}
-button:focus,button:focus-visible,button:active,input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus,textarea:focus-visible{outline:none;box-shadow:none}
+button,input,select,textarea{-webkit-appearance:none;appearance:none;outline:none!important;box-shadow:none!important;-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none;user-select:none}
+button:focus,button:focus-visible,button:focus-within,button:active,button::-moz-focus-inner,input:focus,input:focus-visible,input:active,select:focus,select:focus-visible,textarea:focus,textarea:focus-visible{outline:none!important;box-shadow:none!important;border-color:inherit}
+*{-webkit-tap-highlight-color:rgba(0,0,0,0)!important}
 
 
 /* ── Login ── */
