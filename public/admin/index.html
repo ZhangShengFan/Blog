@@ -435,6 +435,16 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
           <div class="form-group"><label class="form-label">状态页链接</label><input class="form-input" id="s-status-page-url" placeholder=""></div>
         </div>
 
+
+        <div class="sidebar-card" id="categories-card">
+          <div class="sidebar-card-title">文章分类管理</div>
+          <div id="category-tags" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input class="form-input" id="new-category-input" placeholder="输入新分类名称" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();addCategory();}">
+            <button class="btn btn-sm" onclick="addCategory()" style="white-space:nowrap;padding:0 14px;height:38px;border-radius:10px;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;cursor:pointer;">添加</button>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:4px;">点击分类标签上的 × 可删除（至少保留一个）</p>
+        </div>
         <div class="sidebar-card">
           <div class="sidebar-card-title">友链页面</div>
           <div class="form-group"><label class="form-label">仓库地址</label><input class="form-input" id="s-repoUrl" placeholder="https://github.com/ZhangShengFan/Blog"></div>
@@ -464,6 +474,7 @@ let friends = [];
 let currentPost = null;
 let currentFriend = null;
 let currentSettings = { sha: null, raw: '' };
+let currentContentConfig = { sha: null, categories: ['教程', '技术', '随笔', '分享', '其他'] };
 let easyMDE = null;
 let currentTab = 'posts';
 
@@ -762,10 +773,14 @@ async function getFileContent(path) {
 async function loadData() {
   showLoading(true);
   try {
-    const [postFiles, friendFiles, settingsFile] = await Promise.all([listDir('posts'), listDir('friends'), getFileContent('config/site.config.ts')]);
+    const [postFiles, friendFiles, settingsFile, contentConfigFile] = await Promise.all([listDir('posts'), listDir('friends'), getFileContent('config/site.config.ts'), getFileContent('config/content.config.json')]);
     posts = postFiles.filter(f => f.name.endsWith('.md')).map(f => ({ name: f.name, sha: f.sha, path: f.path }));
     friends = friendFiles.filter(f => f.name.endsWith('.json')).map(f => ({ name: f.name, sha: f.sha, path: f.path }));
     currentSettings = { sha: settingsFile.sha, raw: settingsFile.content };
+    try {
+      const cc = JSON.parse(contentConfigFile.content);
+      currentContentConfig = { sha: contentConfigFile.sha, categories: cc.postCategories || [] };
+    } catch(e) { /* 保持默认值 */ }
     renderPostList();
     renderFriendList();
     renderSettingsForm();
@@ -1281,6 +1296,15 @@ export const siteConfig = {
   const encoded = btoa(unescape(encodeURIComponent(content)));
   showLoading(true);
   try {
+    // 保存分类配置
+    const ccPayload = JSON.stringify({ postCategories: currentContentConfig.categories, fallbackCategory: '其他' }, null, 2);
+    const ccBase64 = btoa(unescape(encodeURIComponent(ccPayload)));
+    await ghAPI('contents/config/content.config.json', 'PUT', {
+      message: '更新文章分类配置',
+      content: ccBase64,
+      ...(currentContentConfig.sha ? { sha: currentContentConfig.sha } : {})
+    });
+    // 保存站点配置
     await ghAPI('contents/config/site.config.ts', 'PUT', {
       message: 'chore: update site settings from admin panel',
       content: encoded,
@@ -1288,6 +1312,9 @@ export const siteConfig = {
       ...(currentSettings.sha ? { sha: currentSettings.sha } : {}),
     });
     showToast('站点设置已保存', 'success');
+    // 刷新 SHA
+    const newCc = await getFileContent('config/content.config.json').catch(()=>null);
+    if (newCc) currentContentConfig.sha = newCc.sha;
     await loadData();
   } catch(e) {
     showToast('保存失败：' + e.message, 'error');
