@@ -33,6 +33,14 @@
       var away = 'w(°Д°)w 不要走！再看看嘛~';
       var back  = '♪(^▽^*) 欢迎回来！';
       var backTimer = null;
+      // 系统主题变化时同步 data-theme（仅未手动切换时生效）
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      mq.addEventListener('change', function(e) {
+        var html = document.documentElement;
+        if (!html.dataset.themeManual) {
+          html.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+      });
       document.addEventListener('visibilitychange', function () {
         clearTimeout(backTimer);
         if (document.hidden) {
