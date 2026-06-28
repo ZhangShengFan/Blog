@@ -11,7 +11,7 @@ export const siteConfig = {
   runtimeShowHours: true,
   runtimeShowMinutes: true,
   runtimeShowSeconds: true,
-  url: 'https://blog.zsfan8986.dpdns.org',
+  url: 'https://blog.zsfan.top',
   social: {
     github: 'https://github.com/ZhangShengFan/',
     email: 'mailto:zsfan-nb@hotmail.com',
@@ -39,7 +39,7 @@ export const siteConfig = {
   analytics: {
     umamiScriptSrc: 'https://cloud.umami.is/script.js',
     umamiWebsiteId: 'a94473a1-ffcb-421b-8ebc-70eb7c821ee6',
-    umamiShareUrl: 'https://cloud.umami.is/share/a94473a1-ffcb-421b-8ebc-70eb7c821ee6/blog.zsfan8986.dpdns.org',
+    umamiShareUrl: 'https://cloud.umami.is/share/a94473a1-ffcb-421b-8ebc-70eb7c821ee6/blog.zsfan.top',
     statusPageUrl: 'https://stats.uptimerobot.com/3E0p7h6Q0D',
   },
 };
