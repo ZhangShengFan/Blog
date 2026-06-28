@@ -399,6 +399,7 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
           <div class="form-group"><label class="form-label">显示小时</label><select class="form-input" id="s-runtimeShowHours"><option value="true">显示</option><option value="false">隐藏</option></select></div>
           <div class="form-group"><label class="form-label">显示分钟</label><select class="form-input" id="s-runtimeShowMinutes"><option value="true">显示</option><option value="false">隐藏</option></select></div>
           <div class="form-group"><label class="form-label">显示秒数</label><select class="form-input" id="s-runtimeShowSeconds"><option value="true">显示</option><option value="false">隐藏</option></select></div>
+          <div class="form-group"><label class="form-label">运行时间前缀文字</label><input class="form-input" id="s-runtimeLabel" placeholder="本站已运行"></div>
           <div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="s-logo" placeholder="/logo.png"></div>
           <div class="form-group"><label class="form-label">SEO 图片 URL</label><input class="form-input" id="s-seoImage" placeholder="/logo.png"></div>
         </div>
@@ -1125,6 +1126,8 @@ function parseSiteConfig(source) {
     runtimeShowHours: readConfigValue(source, /runtimeShowHours:\s*(true|false)/),
     runtimeShowMinutes: readConfigValue(source, /runtimeShowMinutes:\s*(true|false)/),
     runtimeShowSeconds: readConfigValue(source, /runtimeShowSeconds:\s*(true|false)/),
+    runtimeLabel: readConfigValue(source, /runtimeLabel:\s*'([^']*)'/),
+    runtimeLabelRaw: readConfigValue(source, /runtimeLabel:\s*'([^']*)'/),
     url: readConfigValue(source, /url:\s*'([^']*)'/),
     github: readConfigValue(source, /github:\s*'([^']*)'/),
     email: readConfigValue(source, /email:\s*'([^']*)'/),
@@ -1158,6 +1161,7 @@ function renderSettingsForm() {
     's-runtimeShowHours': cfg.runtimeShowHours || 'true',
     's-runtimeShowMinutes': cfg.runtimeShowMinutes || 'true',
     's-runtimeShowSeconds': cfg.runtimeShowSeconds || 'true',
+    's-runtimeLabel': cfg.runtimeLabel || '本站已运行',
     's-logo': cfg.logo,
     's-seoImage': cfg.seoImage,
     's-author-name': cfg.authorName,
@@ -1199,6 +1203,7 @@ async function saveSiteSettings() {
     runtimeShowHours: document.getElementById('s-runtimeShowHours').value === 'true',
     runtimeShowMinutes: document.getElementById('s-runtimeShowMinutes').value === 'true',
     runtimeShowSeconds: document.getElementById('s-runtimeShowSeconds').value === 'true',
+    runtimeLabel: document.getElementById('s-runtimeLabel').value.trim() || '本站已运行',
     logo: document.getElementById('s-logo').value.trim(),
     seoImage: document.getElementById('s-seoImage').value.trim(),
     github: document.getElementById('s-github').value.trim(),
@@ -1234,11 +1239,11 @@ export const siteConfig = {
   logo: '${escTS(data.logo || '/logo.png')}',
   seoImage: '${escTS(data.seoImage || '/logo.png')}',
   footerText: '${escTS(data.footerText)}',
-  runtimeStartDate: '${escTS(data.runtimeStartDate)}',
   runtimeStartDate: '${escTS(data.runtimeStartDate || '2026-01-01')}',
-  runtimeShowHours: ${'${data.runtimeShowHours}'},
-  runtimeShowMinutes: ${'${data.runtimeShowMinutes}'},
-  runtimeShowSeconds: ${'${data.runtimeShowSeconds}'},
+  runtimeShowHours: ${data.runtimeShowHours},
+  runtimeShowMinutes: ${data.runtimeShowMinutes},
+  runtimeShowSeconds: ${data.runtimeShowSeconds},
+  runtimeLabel: '${escTS(data.runtimeLabel || '本站已运行')}',
   url: '${escTS(data.url)}',
   social: {
     github: '${escTS(data.github)}',
