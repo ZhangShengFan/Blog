@@ -11,6 +11,7 @@ export const siteConfig = {
   runtimeShowHours: true,
   runtimeShowMinutes: true,
   runtimeShowSeconds: true,
+  runtimeLabel: '本站已运行',
   url: 'https://blog.zsfan.top',
   social: {
     github: 'https://github.com/ZhangShengFan/',
