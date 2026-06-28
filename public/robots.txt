@@ -8,4 +8,4 @@ Disallow: /workbox-*.js
 
 Crawl-delay: 1
 
-Sitemap: https://blog.zsfan8986.dpdns.org/sitemap.xml
+Sitemap: https://blog.zsfan.top/sitemap.xml

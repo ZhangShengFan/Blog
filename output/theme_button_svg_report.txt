@@ -1,0 +1,35 @@
+status_before=M public/admin/index.html
+?? output/
+?? output_kv_token_patch_report.txt
+svg_icons_added=True
+emoji_removed=True
+css_display_toggle=True
+update_cleaned=True
+commit_returncode=0
+commit_stdout=[main 9ce4212] 后台主题按钮改用 CSS SVG
+ Committer: root <root@e2b.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+commit_stderr=
+pull_returncode=0
+pull_stdout=Current branch main is up to date.
+pull_stderr=From https://github.com/ZhangShengFan/Blog
+ * branch            main       -> FETCH_HEAD
+push_returncode=0
+push_stdout=
+push_stderr=To https://github.com/ZhangShengFan/Blog.git
+   d1da65c..9ce4212  main -> main
+last_commit=9ce4212 后台主题按钮改用 CSS SVG
+status_after=?? output/
+?? output_kv_token_patch_report.txt

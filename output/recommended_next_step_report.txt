@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "login_card_refined": true,
+    "login_visual_layout_missing": true,
+    "topbar_synced": true,
+    "theme_toggle_synced": true,
+    "base_components_unified": true
+  },
+  "last5": "1ab7bb5 统一后台基础组件样式\nfbd1a07 统一后台顶部导航样式\na0e4385 同步后台主题按钮样式\n8dd1b55 后台主题支持跟随系统\nfe16c55 移除运行时间异常文案配置",
+  "status": "?? output/\n?? output_kv_token_patch_report.txt"
+}

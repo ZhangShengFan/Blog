@@ -1,0 +1,33 @@
+status_before=M public/admin/index.html
+?? output/
+?? output_kv_token_patch_report.txt
+button_replaced=True
+tooltip_mode=True
+commit_returncode=0
+commit_stdout=[main a0e4385] 同步后台主题按钮样式
+ Committer: root <root@e2b.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+commit_stderr=
+pull_returncode=0
+pull_stdout=Current branch main is up to date.
+pull_stderr=From https://github.com/ZhangShengFan/Blog
+ * branch            main       -> FETCH_HEAD
+push_returncode=0
+push_stdout=
+push_stderr=To https://github.com/ZhangShengFan/Blog.git
+   8dd1b55..a0e4385  main -> main
+last_commit=a0e4385 同步后台主题按钮样式
+status_after=?? output/
+?? output_kv_token_patch_report.txt

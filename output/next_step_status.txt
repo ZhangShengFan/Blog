@@ -1,0 +1,21 @@
+last5
+fe16c55 移除运行时间异常文案配置
+b3ae9e9 后台支持暗黑模式
+83cda8b 精简页脚运行时间配置项
+3eda469 支持后台自定义页脚运行时间
+d7c7da4 支持 KV 持久化 GitHub Token
+
+status
+?? output/
+?? output_kv_token_patch_report.txt
+
+checks
+{
+  "theme_toggle": true,
+  "theme_system_option": false,
+  "runtime_start_date_setting": true,
+  "runtime_hours_setting": true,
+  "runtime_minutes_setting": true,
+  "runtime_seconds_setting": true,
+  "runtime_invalid_text_setting": false
+}
