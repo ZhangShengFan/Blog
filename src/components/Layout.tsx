@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sun, Moon, Github, Menu, X, Search, Mail, Heart, Zap, Coffee, Code2, Layers, GitBranch, Box, Monitor, Rss, Image, BookOpen, Archive, Tag, BarChart3, Users, Info } from 'lucide-react';
+import { Sun, Moon, Github, Menu, X, Search, Mail, Heart, Zap, Coffee, Clock, Code2, Layers, GitBranch, Box, Monitor, Rss, Image, BookOpen, Archive, Tag, BarChart3, Users, Info } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { preloadPage } from '@/utils/preload';
 import { siteConfig } from '@config/site.config';
@@ -928,6 +928,12 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
                     <Coffee size={13} className="text-amber-700 dark:text-amber-600" />
                     <span>By ZSFan</span>
                   </motion.div>
+                  {runtimeText && (
+                    <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.08, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
+                      <Clock size={13} className="text-zinc-400 dark:text-zinc-500" />
+                      <span>{runtimeText}</span>
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </div>
@@ -976,9 +982,6 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
 
         <div className="flex w-full flex-col items-center justify-between border-t border-zinc-200/50 pt-8 text-center text-xs font-medium text-zinc-700 dark:border-zinc-800/50 dark:text-zinc-300 md:flex-row md:text-left">
           <p>{siteConfig.footerText} · {siteConfig.author.name}</p>
-          {runtimeText && (
-            <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">{runtimeText}</p>
-          )}
           <div className="mt-4 flex flex-col items-center gap-3 md:mt-0 md:flex-row md:gap-6">
             <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
               {siteConfig.beian.text}
