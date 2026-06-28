@@ -163,11 +163,12 @@ export const Stats = () => {
 
         <div className="flex justify-center">
           <a
-            href={siteConfig.analytics.umamiShareUrl}
+            href={siteConfig.analytics.umamiShareUrl || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-14 w-full max-w-xl items-center justify-center gap-3 rounded-2xl border border-zinc-300 bg-zinc-900 px-6 py-4 text-base font-bold text-white transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-white dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:ring-offset-zinc-950 sm:text-lg"
             title="查看 Umami 统计数据"
+            onClick={(e) => { if (!siteConfig.analytics.umamiShareUrl) e.preventDefault(); }}
           >
             <BarChart3 size={20} />
             <span>查看 Umami 统计数据</span>
@@ -189,11 +190,12 @@ export const Stats = () => {
 
         <div className="flex justify-center">
           <a
-            href={siteConfig.analytics.statusPageUrl}
+            href={siteConfig.analytics.statusPageUrl || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-14 w-full max-w-xl items-center justify-center gap-3 rounded-2xl border border-zinc-300 bg-zinc-900 px-6 py-4 text-base font-bold text-white transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-white dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:ring-offset-zinc-950 sm:text-lg"
             title="查看网站运行状态"
+            onClick={(e) => { if (!siteConfig.analytics.statusPageUrl) e.preventDefault(); }}
           >
             <Activity size={20} />
             <span>查看网站运行状态</span>
