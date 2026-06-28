@@ -8,9 +8,10 @@ export const siteConfig = {
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
   runtimeStartDate: '2026-01-01',
-  runtimeShowHours: true,
-  runtimeShowMinutes: true,
-  runtimeShowSeconds: true,
+  runtimeStartDate: '2026-01-01',
+  runtimeShowHours: ${data.runtimeShowHours},
+  runtimeShowMinutes: ${data.runtimeShowMinutes},
+  runtimeShowSeconds: ${data.runtimeShowSeconds},
   url: 'https://blog.zsfan.top',
   social: {
     github: 'https://github.com/ZhangShengFan/',
@@ -33,7 +34,7 @@ export const siteConfig = {
     announcement: '博客已重置完成，新的内容将从这里重新开始。',
   },
   beian: {
-    text: '',
+    text: '鲁ICP备2026046200号',
     url: '',
   },
   analytics: {
