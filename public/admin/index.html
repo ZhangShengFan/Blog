@@ -180,8 +180,9 @@ body{background:var(--bg);color:var(--text);min-height:100dvh;transition:backgro
 .cover-preview img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 .helper-text{font-size:11px;color:var(--muted);line-height:1.5}
 
-.btn-logout{border-radius:999px;padding:6px 16px;font-size:13px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);color:var(--text);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
-.btn-logout:hover{background:#dc2626;color:#fff;border-color:transparent}
+.btn-logout{-webkit-appearance:none;appearance:none;outline:none;box-shadow:none;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);color:var(--text);cursor:pointer;transition:background .15s,color .15s,border-color .15s,box-shadow .15s;tap-highlight-color:transparent;-webkit-tap-highlight-color:transparent}
+.btn-logout:hover{background:#dc2626;color:#fff;border-color:transparent;box-shadow:none}
+.btn-logout:focus,.btn-logout:focus-visible,.btn-logout:active{outline:none;box-shadow:none}
 </style>
 </head>
 <body>
