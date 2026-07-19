@@ -132,13 +132,15 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpand, setNeedsExpand] = useState(false);
+  const [lineCount, setLineCount] = useState(1);
   const resetTimerRef = useRef<number | null>(null);
   const lang = extractLangFromChildren(children);
 
   useEffect(() => {
     if (preRef.current) {
-      const lineCount = (preRef.current.innerText.match(/\n/g) || []).length + 1;
-      setNeedsExpand(lineCount > MAX_CODE_LINES);
+      const count = (preRef.current.innerText.replace(/\n$/, '').match(/\n/g) || []).length + 1;
+      setLineCount(count);
+      setNeedsExpand(count > MAX_CODE_LINES);
     }
     return () => {
       if (resetTimerRef.current !== null) {
@@ -212,11 +214,20 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
       </button>
 
       {/* Code block with optional collapse */}
-      <div className="relative">
+      <div className="relative flex">
+        <div
+          aria-hidden="true"
+          className="hidden select-none flex-col items-end gap-0 rounded-l-lg bg-black/20 py-3 pl-3 pr-2 pt-10 text-right font-mono text-xs leading-6 text-zinc-500 sm:flex md:py-6 md:pt-7"
+          style={needsExpand && !isExpanded ? { maxHeight: '32rem', overflow: 'hidden' } : undefined}
+        >
+          {Array.from({ length: lineCount }, (_, i) => (
+            <span key={i}>{i + 1}</span>
+          ))}
+        </div>
         <pre
           ref={preRef}
           {...props}
-          className={`${props.className || ''} !my-0 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-600 touch-pan-x !p-3 !pt-10 md:!p-6 md:!pt-7`}
+          className={`${props.className || ''} !my-0 flex-1 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-600 touch-pan-x !p-3 !pt-10 leading-6 md:!p-6 md:!pt-7 sm:rounded-l-none`}
           style={needsExpand && !isExpanded ? { maxHeight: '32rem' } : undefined}
         >
           {childrenWithProps}
