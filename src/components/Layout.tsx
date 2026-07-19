@@ -986,6 +986,17 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
             <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
               {siteConfig.beian.text}
             </a>
+            {siteConfig.gonganBeian.enabled && (
+              <a
+                href={siteConfig.gonganBeian.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 transition-colors hover:text-accent"
+              >
+                <img src="/gongan-badge.png" alt="" className="h-3.5 w-3.5" aria-hidden="true" />
+                {siteConfig.gonganBeian.text}
+              </a>
+            )}
             <span className="flex items-center gap-1">
               Made with <Heart size={10} className="fill-accent text-accent" /> by {siteConfig.author.name}
             </span>

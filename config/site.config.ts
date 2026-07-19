@@ -37,6 +37,12 @@ export const siteConfig = {
     text: '鲁ICP备2026046200号',
     url: 'https://beian.miit.gov.cn/',
   },
+  gonganBeian: {
+    // TODO: 前往 https://www.beian.gov.cn/portal/index 申请后填入真实的公网安备号码，并将 enabled 设为 true
+    enabled: false,
+    text: '鲁公网安备XXXXXXXXXXXXX号',
+    url: 'https://www.beian.gov.cn/portal/registerSystemInfo',
+  },
   analytics: {
     umamiScriptSrc: 'https://cloud.umami.is/script.js',
     umamiWebsiteId: 'a94473a1-ffcb-421b-8ebc-70eb7c821ee6',
