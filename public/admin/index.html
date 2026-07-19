@@ -429,6 +429,12 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
           <div class="sidebar-card-title">备案信息</div>
           <div class="form-group"><label class="form-label">备案文字</label><input class="form-input" id="s-beian-text" placeholder="粤ICP备xxxx号"></div>
           <div class="form-group"><label class="form-label">备案链接</label><input class="form-input" id="s-beian-url" placeholder="https://beian.miit.gov.cn/"></div>
+          <div class="toggle-row">
+            <span>显示公网安备号</span>
+            <label class="toggle"><input type="checkbox" id="s-gongan-enabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-group"><label class="form-label">公网安备文字</label><input class="form-input" id="s-gongan-text" placeholder="粤公网安备xxxxxxxxxxxxx号"></div>
+          <div class="form-group"><label class="form-label">公网安备链接</label><input class="form-input" id="s-gongan-url" placeholder="https://www.beian.gov.cn/portal/registerSystemInfo"></div>
         </div>
 
         <div class="sidebar-card">
@@ -1180,6 +1186,9 @@ function parseSiteConfig(source) {
     announcement: readConfigValue(source, /announcement:\s*'([^']*)'/),
     beianText: readConfigValue(source, /beian:\s*\{[\s\S]*?text:\s*'([^']*)'/),
     beianUrl: readConfigValue(source, /beian:\s*\{[\s\S]*?url:\s*'([^']*)'/),
+    gonganEnabled: readConfigValue(source, /gonganBeian:\s*\{[\s\S]*?enabled:\s*(true|false)/) === 'true',
+    gonganText: readConfigValue(source, /gonganBeian:\s*\{[\s\S]*?text:\s*'([^']*)'/),
+    gonganUrl: readConfigValue(source, /gonganBeian:\s*\{[\s\S]*?url:\s*'([^']*)'/),
     umamiScriptSrc: readConfigValue(source, /analytics:\s*\{[\s\S]*?umamiScriptSrc:\s*'([^']*)'/),
     umamiWebsiteId: readConfigValue(source, /analytics:\s*\{[\s\S]*?umamiWebsiteId:\s*'([^']*)'/),
     umamiShareUrl: readConfigValue(source, /analytics:\s*\{[\s\S]*?umamiShareUrl:\s*'([^']*)'/),
@@ -1211,6 +1220,8 @@ function renderSettingsForm() {
     's-rawEmail': cfg.rawEmail,
     's-beian-text': cfg.beianText,
     's-beian-url': cfg.beianUrl,
+    's-gongan-text': cfg.gonganText,
+    's-gongan-url': cfg.gonganUrl,
     's-umami-script-src': cfg.umamiScriptSrc,
     's-umami-website-id': cfg.umamiWebsiteId,
     's-umami-share-url': cfg.umamiShareUrl,
@@ -1224,6 +1235,8 @@ function renderSettingsForm() {
     const el = document.getElementById(id);
     if (el) el.value = value || '';
   });
+  const gonganEnabledEl = document.getElementById('s-gongan-enabled');
+  if (gonganEnabledEl) gonganEnabledEl.checked = !!cfg.gonganEnabled;
 }
 
 function escTS(value) {
@@ -1257,6 +1270,9 @@ async function saveSiteSettings() {
     announcement: document.getElementById('s-announcement').value.trim(),
     beianText: document.getElementById('s-beian-text').value.trim(),
     beianUrl: document.getElementById('s-beian-url').value.trim(),
+    gonganEnabled: document.getElementById('s-gongan-enabled').checked,
+    gonganText: document.getElementById('s-gongan-text').value.trim(),
+    gonganUrl: document.getElementById('s-gongan-url').value.trim(),
     umamiScriptSrc: document.getElementById('s-umami-script-src').value.trim(),
     umamiWebsiteId: document.getElementById('s-umami-website-id').value.trim(),
     umamiShareUrl: document.getElementById('s-umami-share-url').value.trim(),
@@ -1306,6 +1322,11 @@ export const siteConfig = {
   beian: {
     text: '${escTS(data.beianText)}',
     url: '${escTS(data.beianUrl)}',
+  },
+  gonganBeian: {
+    enabled: ${data.gonganEnabled ? 'true' : 'false'},
+    text: '${escTS(data.gonganText)}',
+    url: '${escTS(data.gonganUrl)}',
   },
   analytics: {
     umamiScriptSrc: '${escTS(data.umamiScriptSrc || 'https://cloud.umami.is/script.js')}',
