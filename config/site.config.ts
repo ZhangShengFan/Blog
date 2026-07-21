@@ -7,11 +7,11 @@ export const siteConfig = {
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
-  runtimeStartDate: '2026-01-01',
+  runtimeStartDate: '2026-06-14',
   runtimeShowHours: true,
-  runtimeShowMinutes: true,
-  runtimeShowSeconds: true,
-  runtimeLabel: '本站已运行',
+  runtimeShowMinutes: false,
+  runtimeShowSeconds: false,
+  runtimeLabel: '小站已苟活',
   url: 'https://blog.zsfan.top',
   social: {
     github: 'https://github.com/ZhangShengFan/',
@@ -38,7 +38,6 @@ export const siteConfig = {
     url: 'https://beian.miit.gov.cn/',
   },
   gonganBeian: {
-    // TODO: 前往 https://www.beian.gov.cn/portal/index 申请后填入真实的公网安备号码，并将 enabled 设为 true
     enabled: false,
     text: '鲁公网安备XXXXXXXXXXXXX号',
     url: 'https://www.beian.gov.cn/portal/registerSystemInfo',
