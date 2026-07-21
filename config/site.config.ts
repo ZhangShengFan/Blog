@@ -34,8 +34,8 @@ export const siteConfig = {
     announcement: '博客已重置完成，新的内容将从这里重新开始。',
   },
   beian: {
-    text: '鲁ICP备2026046200号',
-    url: 'https://beian.miit.gov.cn/',
+    text: '',
+    url: '',
   },
   gonganBeian: {
     enabled: false,
