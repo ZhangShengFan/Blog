@@ -837,7 +837,14 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
     };
 
     updateRuntime();
-    const timer = window.setInterval(updateRuntime, 1000);
+    const updateInterval = siteConfig.runtimeShowSeconds
+      ? 1000
+      : siteConfig.runtimeShowMinutes
+        ? 60 * 1000
+        : siteConfig.runtimeShowHours
+          ? 60 * 1000
+          : 24 * 60 * 60 * 1000;
+    const timer = window.setInterval(updateRuntime, updateInterval);
 
     return () => window.clearInterval(timer);
   }, [isPostPage]);
@@ -1110,9 +1117,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) =
   return (
     <div className="relative flex min-h-screen flex-col selection:bg-accent selection:text-white">
       <Background />
+      <a
+        href="#main-content"
+        className="fixed left-3 top-3 z-[120] -translate-y-20 rounded-lg bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-transform focus:translate-y-0 dark:bg-white dark:text-zinc-950"
+      >
+        跳到主要内容
+      </a>
       <Navbar onSearchClick={openSearch} />
       <SearchModal isOpen={isSearchOpen} onClose={closeSearch} />
-      <main className="relative flex-grow px-3 pt-20 sm:px-6 sm:pt-24 md:pt-32">
+      <main id="main-content" tabIndex={-1} className="relative flex-grow px-3 pt-20 outline-none sm:px-6 sm:pt-24 md:pt-32">
         {hasViewTransition ? (
           <div key={routeContentKey} style={{ viewTransitionName: 'route-content' }} className="mx-auto max-w-7xl">
             {children}

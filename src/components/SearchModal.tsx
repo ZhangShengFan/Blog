@@ -58,6 +58,7 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const visibleResults = results.slice(0, 8);
   const activeScopeHint = SEARCH_SCOPE_HINTS[searchScope];
   const modalEase = easeSmooth;
+  const getResultDomId = (id: string) => `site-search-result-${encodeURIComponent(id)}`;
 
   const saveHistory = (query: string) => {
     if (!query.trim()) return;
@@ -193,6 +194,7 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-16 sm:pt-24">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.16, ease: modalEase }} onClick={onClose} className="absolute inset-0 bg-void/55" />
           <motion.div ref={modalRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: modalEase }} className="relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" role="dialog" aria-modal="true" aria-labelledby="site-search-title" aria-describedby="site-search-desc">
+            <h2 id="site-search-title" className="sr-only">站内搜索</h2>
             <div className="flex items-center border-b border-zinc-100 p-4 dark:border-zinc-800">
               <Search className="mr-3 text-zinc-600 dark:text-zinc-300" size={20} />
               <input
@@ -204,6 +206,10 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 onChange={(event) => handleSearch(event.target.value)}
                 onKeyDown={handleInputKeyDown}
                 aria-labelledby="site-search-title"
+                aria-describedby="site-search-desc"
+                aria-controls="site-search-results"
+                aria-autocomplete="list"
+                aria-activedescendant={visibleResults[activeResultIndex] ? getResultDomId(visibleResults[activeResultIndex].id) : undefined}
               />
               <button ref={closeButtonRef} onClick={onClose} className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800" aria-label="关闭站内搜索">
                 <X size={20} />
@@ -232,14 +238,14 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
               <p className="mt-2 text-xs text-zinc-700 dark:text-zinc-300">{activeScopeHint}</p>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto">
+            <div id="site-search-results" role="listbox" aria-label="搜索结果" aria-busy={isSearching} className="max-h-[60vh] overflow-y-auto">
               {isSearching ? (
                 <div className="p-12 text-center text-zinc-600 dark:text-zinc-300">
                   <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-zinc-900 border-t-transparent dark:border-zinc-100" />
                 </div>
               ) : visibleResults.length > 0 ? (
                 <div className="p-2">
-                  <div id="site-search-title" className="px-3 pt-3 text-xs font-medium uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">
+                  <div id="site-search-results-count" aria-live="polite" className="px-3 pt-3 text-xs font-medium uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">
                     {results.length} {TEXT.resultsSuffix}
                   </div>
                   {visibleResults.map((post, index) => {
@@ -247,6 +253,9 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                     return (
                       <button
                         key={post.id}
+                        id={getResultDomId(post.id)}
+                        role="option"
+                        aria-selected={isActive}
                         onMouseEnter={() => setActiveResultIndex(index)}
                         onClick={() => handleSelect(post.id)}
                         className={`group block w-full rounded-xl p-4 text-left transition-colors ${
