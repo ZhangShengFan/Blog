@@ -751,15 +751,20 @@ export const Post = () => {
 
   const authors = getDisplayAuthors(post);
   const authorsLabel = authors.map((author) => author.name).join('\u3001');
+  const postImageUrl = new URL(post.coverImage || siteConfig.seoImage, siteConfig.url).toString();
 
   const postStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage ? [new URL(post.coverImage, siteConfig.url).toString()] : [siteConfig.seoImage],
+    image: [postImageUrl],
     datePublished: post.date,
     dateModified: post.updatedAt || post.date,
+    inLanguage: 'zh-CN',
+    articleSection: post.category,
+    wordCount,
+    timeRequired: `PT${Math.max(1, Math.ceil(wordCount / 300))}M`,
     author: authors.map((author) => ({
       '@type': 'Person',
       name: author.name,
@@ -772,7 +777,7 @@ export const Post = () => {
       url: siteConfig.url,
       logo: {
         '@type': 'ImageObject',
-        url: siteConfig.logo
+        url: new URL(siteConfig.logo, siteConfig.url).toString()
       }
     },
     keywords: post.tags?.join(', ')

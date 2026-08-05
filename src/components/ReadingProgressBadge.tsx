@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useState } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { BookOpenCheck } from 'lucide-react';
@@ -22,9 +22,10 @@ const DESKTOP_BADGE_STYLE = {
 export const ReadingProgressBadge: React.FC<ReadingProgressBadgeProps> = React.memo(({ targetRef, onVisibilityChange }) => {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const updateProgress = () => {
+    const syncProgress = () => {
       const target = targetRef.current;
 
       if (!target) {
@@ -45,12 +46,27 @@ export const ReadingProgressBadge: React.FC<ReadingProgressBadgeProps> = React.m
       setIsVisible(rect.top < viewportHeight - startOffset && rect.bottom > endOffset);
     };
 
+    const updateProgress = () => {
+      if (frameRef.current !== null) {
+        return;
+      }
+
+      frameRef.current = window.requestAnimationFrame(() => {
+        frameRef.current = null;
+        syncProgress();
+      });
+    };
+
     updateProgress();
 
     window.addEventListener('scroll', updateProgress, { passive: true });
     window.addEventListener('resize', updateProgress);
 
     return () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
       window.removeEventListener('scroll', updateProgress);
       window.removeEventListener('resize', updateProgress);
     };

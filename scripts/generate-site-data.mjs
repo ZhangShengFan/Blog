@@ -251,6 +251,11 @@ const normalizeAuthors = (author, authors) => {
     : undefined;
 };
 
+const ALLOWED_POST_FIELDS = new Set([
+  'id', 'title', 'excerpt', 'date', 'updatedAt', 'category', 'tags', 'coverImage',
+  'draft', 'readTime', 'author', 'authors', 'featured', 'top'
+]);
+
 const formatFrontmatterDate = (value) => {
   if (!value) {
     return undefined;
@@ -290,6 +295,12 @@ const normalizeCategory = (value) => {
 
 const validatePostFrontmatter = (filename, data, formattedDate, formattedUpdatedAt, id) => {
   const errors = [];
+
+  Object.keys(data).forEach((field) => {
+    if (!ALLOWED_POST_FIELDS.has(field)) {
+      errors.push(`unknown field "${field}"`);
+    }
+  });
 
   if (typeof id !== 'string' || id.trim() === '') {
     errors.push('id must be a non-empty string');
@@ -479,6 +490,24 @@ const generateSitemap = () => {
   logger.step('Generated sitemap.xml', `urls=${staticPages.length + posts.length}`);
 };
 
+const generateRobots = () => {
+  const robotsContent = `User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /generated/
+Disallow: /*.json$
+Disallow: /sw.js
+Disallow: /workbox-*.js
+
+Crawl-delay: 1
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+
+  fs.writeFileSync(path.join(PUBLIC_DIR, 'robots.txt'), robotsContent);
+  logger.step('Generated robots.txt');
+};
+
 const generateRss = () => {
   const latestUpdate = postsWithSearch[0] ? new Date(postsWithSearch.reduce((latest, post) => {
     const current = new Date(post.updatedAt || post.date);
@@ -553,11 +582,12 @@ const generateRss = () => {
 };
 
 generateSitemap();
+generateRobots();
 generateRss();
 
 logger.summary({
   posts: posts.length,
   friends: friends.length,
-  outputs: 5,
+  outputs: 6,
   siteUrl: SITE_URL
 });

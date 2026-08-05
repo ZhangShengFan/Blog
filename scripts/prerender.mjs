@@ -52,6 +52,9 @@ const escapeJsonForHtml = (value) => JSON.stringify(value)
   .replace(/\u2028/g, '\\u2028')
   .replace(/\u2029/g, '\\u2029');
 
+const markHelmetManagedMeta = (value) => value
+  .replace(/<(meta|script)(?=[ >])/g, '<$1 data-rh="true"');
+
 const createImagePreload = (imageUrl, imagesizes) => {
   if (!imageUrl) {
     return '';
@@ -126,10 +129,10 @@ const injectSeoMeta = (htmlTemplate, title, description, extraMeta = '') => {
   let html = htmlTemplate.replace(/<title>.*?<\/title>/, `<title>${escapeHtmlText(title)}</title>`);
 
   if (description) {
-    const metaDescTag = `<meta name="description" content="${escapeHtmlAttribute(description)}">`;
+    const metaDescTag = `<meta data-rh="true" name="description" content="${escapeHtmlAttribute(description)}">`;
 
-    if (html.includes('<meta name="description"')) {
-      html = html.replace(/<meta name="description" content=".*?">/, metaDescTag);
+    if (/<meta\b[^>]*\bname="description"[^>]*>/i.test(html)) {
+      html = html.replace(/<meta\b[^>]*\bname="description"[^>]*\/?>/, metaDescTag);
     } else {
       html = html.replace('</title>', `</title>\n    ${metaDescTag}`);
     }
@@ -137,14 +140,18 @@ const injectSeoMeta = (htmlTemplate, title, description, extraMeta = '') => {
 
   if (extraMeta) {
     // Insert extra meta tags before closing </head>
-    html = html.replace('</head>', `${extraMeta}\n</head>`);
+    html = html.replace('</head>', `${markHelmetManagedMeta(extraMeta)}\n</head>`);
   }
 
   return html;
 };
 
+const createPageIndexMeta = (pageUrl, { noindex = false } = {}) => `
+    <link data-rh="true" rel="canonical" href="${escapeHtmlAttribute(pageUrl)}">
+    <meta data-rh="true" name="robots" content="${noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'}">`;
+
 // Helper to write route file
-const writeHtml = (relativePath, title, description, extraMeta = '') => {
+const writeHtml = (relativePath, title, description, extraMeta = '', canonicalPath = relativePath) => {
   const filePath = path.join(DIST_DIR, relativePath, 'index.html');
   const dir = path.dirname(filePath);
 
@@ -152,7 +159,8 @@ const writeHtml = (relativePath, title, description, extraMeta = '') => {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  const html = injectSeoMeta(template, title, description, extraMeta);
+  const canonicalUrl = new URL(canonicalPath, `${SITE_URL}/`).toString();
+  const html = injectSeoMeta(template, title, description, `${createPageIndexMeta(canonicalUrl)}${extraMeta}`);
 
   fs.writeFileSync(filePath, html);
 };
@@ -221,7 +229,7 @@ posts.forEach(post => {
   const imagePreload = createImagePreload(coverImage, '(max-width: 767px) 100vw, (max-width: 1279px) 80vw, 1152px');
   const extraMeta = `${imagePreload}${ogMeta}${jsonLd}`;
 
-  writeHtml(`post/${post.id}`, title, description, extraMeta);
+  writeHtml(`post/${post.id}`, title, description, extraMeta, postUrl);
 });
 
 // 2. Process Static Pages
@@ -240,11 +248,11 @@ staticPages.forEach(page => {
 });
 
 const homeHeroPost = getHomeHeroPost();
-const homeExtraMeta = `${homeHeroPost?.coverImage ? createImagePreload(toAbsoluteUrl(homeHeroPost.coverImage, SITE_URL), '(max-width: 767px) 100vw, 60vw') : ''}${createHomeMeta()}`;
+const homeExtraMeta = `${createPageIndexMeta(SITE_URL)}${homeHeroPost?.coverImage ? createImagePreload(toAbsoluteUrl(homeHeroPost.coverImage, SITE_URL), '(max-width: 767px) 100vw, 60vw') : ''}${createHomeMeta()}`;
 const homeHtml = injectSeoMeta(template, siteTitle, siteConfig.description, homeExtraMeta);
 fs.writeFileSync(indexHtmlPath, homeHtml);
 
-writeStandaloneHtml('404.html', `页面不存在 - ${SITE_SUFFIX}`, '你访问的页面不存在，可能已经移动、重命名或链接已失效。');
+writeStandaloneHtml('404.html', `页面不存在 - ${SITE_SUFFIX}`, '你访问的页面不存在，可能已经移动、重命名或链接已失效。', createPageIndexMeta(`${SITE_URL}/404.html`, { noindex: true }));
 
 logger.step('Generated post pages', `count=${posts.length}`);
 logger.step('Generated static pages', `count=${staticPages.length + 1}`);
