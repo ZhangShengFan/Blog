@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>ZSFan 的博客</title>
     <link rel="icon" href="/logo.png?v=3" />
     <link rel="shortcut icon" href="/logo.png?v=3" />
@@ -29,10 +29,10 @@
 
   <script>
     (function () {
-      var original = document.title;
       var away = 'w(°Д°)w 不要走！再看看嘛~';
       var back  = '♪(^▽^*) 欢迎回来！';
       var backTimer = null;
+      var titleBeforeAway = document.title;
       // 系统主题变化时同步 data-theme（仅未手动切换时生效）
       var mq = window.matchMedia('(prefers-color-scheme: dark)');
       mq.addEventListener('change', function(e) {
@@ -44,11 +44,12 @@
       document.addEventListener('visibilitychange', function () {
         clearTimeout(backTimer);
         if (document.hidden) {
+          titleBeforeAway = document.title;
           document.title = away;
         } else {
           document.title = back;
           backTimer = setTimeout(function () {
-            document.title = original;
+            document.title = titleBeforeAway;
           }, 3000);
         }
       });
@@ -59,10 +60,6 @@
     <div class="bg-noise"></div>
     <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
-
-  <!-- Umami Analytics -->
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="a94473a1-ffcb-421b-8ebc-70eb7c821ee6"></script>
-  <!-- End Umami Analytics -->
 
 </body>
 </html>

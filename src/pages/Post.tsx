@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { easeOut } from '@/utils/motion';
 import DOMPurify from 'dompurify';
 
-import { ArrowLeft, ArrowRight, Clock, Calendar, ChevronRight, Shield, Share2, Copy, Check, Users, ExternalLink, FileText, History } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock, Calendar, ChevronRight, Shield, Share2, Copy, Check, Users, ExternalLink, FileText, History, BookOpen } from 'lucide-react';
 import { getPostById, getPosts } from '@/services/posts';
 import { Post as PostType, PostAuthor, PostMetadata } from '../types';
 import { siteConfig } from '@config/site.config';
@@ -78,6 +78,24 @@ const formatMetaDate = (dateText?: string) => {
     month: '2-digit',
     day: '2-digit'
   });
+};
+
+const selectRelatedPosts = (currentPost: PostMetadata, posts: PostMetadata[], limit = 3) => {
+  const currentTags = new Set(currentPost.tags.map((tag) => tag.toLocaleLowerCase()));
+
+  return posts
+    .filter((candidate) => candidate.id !== currentPost.id)
+    .map((candidate) => {
+      const sharedTagCount = candidate.tags.reduce(
+        (count, tag) => count + (currentTags.has(tag.toLocaleLowerCase()) ? 1 : 0),
+        0
+      );
+      const score = sharedTagCount * 4 + (candidate.category === currentPost.category ? 3 : 0);
+      return { candidate, score };
+    })
+    .sort((a, b) => b.score - a.score || new Date(b.candidate.date).getTime() - new Date(a.candidate.date).getTime())
+    .slice(0, limit)
+    .map(({ candidate }) => candidate);
 };
 
 const getDisplayAuthors = (post: PostType): PostAuthor[] => {
@@ -374,7 +392,7 @@ const createMarkdownComponents = (
     const id = resolveHeadingId(level, children);
     return React.createElement(
       Tag,
-      { ...props, id, className: 'heading-anchor-wrapper' },
+      { ...props, id, className: 'heading-anchor-wrapper', 'aria-label': extractTextFromReactNode(children) },
       React.createElement(
         'button',
         {
@@ -497,6 +515,7 @@ export const Post = () => {
   const [mermaidRenderer, setMermaidRenderer] = useState<MermaidRenderer | null>(null);
   const [mobileFloatingVisible, setMobileFloatingVisible] = useState(false);
   const [adjacentPosts, setAdjacentPosts] = useState<{ prev: PostMetadata | null; next: PostMetadata | null }>({ prev: null, next: null });
+  const [relatedPosts, setRelatedPosts] = useState<PostMetadata[]>([]);
   const articleBodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -647,14 +666,22 @@ export const Post = () => {
     if (!post) return;
     let cancelled = false;
 
-    getPosts().then((allPosts) => {
-      if (cancelled) return;
-      const currentIndex = allPosts.findIndex((p) => p.id === post.id);
-      setAdjacentPosts({
-        prev: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
-        next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
+    getPosts()
+      .then((allPosts) => {
+        if (cancelled) return;
+        const currentIndex = allPosts.findIndex((p) => p.id === post.id);
+        setAdjacentPosts({
+          prev: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
+          next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
+        });
+        setRelatedPosts(selectRelatedPosts(post, allPosts));
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error('Failed to load post navigation:', error);
+        setAdjacentPosts({ prev: null, next: null });
+        setRelatedPosts([]);
       });
-    });
 
     return () => { cancelled = true; };
   }, [post]);
@@ -939,6 +966,47 @@ export const Post = () => {
                 <span>此文章有问题？帮助改进！</span>
               </a>
             </div>
+            {relatedPosts.length > 0 && (
+              <section aria-labelledby="related-posts-title" className="mt-12 border-t border-zinc-200 pt-10 dark:border-zinc-800 md:mt-16 md:pt-12">
+                <div className="mb-6 flex items-end justify-between gap-4">
+                  <div>
+                    <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                      <BookOpen size={14} /> 延伸阅读
+                    </div>
+                    <h2 id="related-posts-title" className="font-serif text-2xl font-bold text-ink dark:text-white md:text-3xl">相关文章</h2>
+                  </div>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">按分类与标签匹配</span>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {relatedPosts.map((relatedPost) => (
+                    <Link
+                      key={relatedPost.id}
+                      to={`/post/${relatedPost.id}`}
+                      className="group flex min-w-0 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/70 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                    >
+                      {relatedPost.coverImage && (
+                        <ProgressiveImage
+                          src={relatedPost.coverImage}
+                          alt=""
+                          loading="lazy"
+                          aspectRatio="16/9"
+                          wrapperClassName="aspect-video w-full bg-zinc-100 dark:bg-zinc-800"
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                        />
+                      )}
+                      <div className="flex flex-1 flex-col p-4">
+                        <span className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">{relatedPost.category}</span>
+                        <h3 className="line-clamp-2 font-serif text-base font-bold leading-snug text-zinc-900 dark:text-zinc-100">{relatedPost.title}</h3>
+                        <div className="mt-auto flex items-center justify-between gap-3 pt-4 text-xs text-zinc-500 dark:text-zinc-400">
+                          <span>{formatMetaDate(relatedPost.date)}</span>
+                          <span>{relatedPost.readTime}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
             {/* 上一篇 / 下一篇导航 */}
             <nav aria-label="文章导航" className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800 md:mt-16 md:pt-10">
               <div className="flex flex-col gap-4 sm:flex-row">

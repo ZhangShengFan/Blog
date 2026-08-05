@@ -7,7 +7,7 @@ import type { PostSearchScope } from '@/services/posts';
 import { easeSmooth } from '@/utils/motion';
 
 const TEXT = {
-  searchPlaceholder: '搜索文章... (⌘K)',
+  searchPlaceholder: '搜索文章... (Ctrl/⌘ K)',
   searchEmpty: '输入关键词开始搜索',
   searchScopeLabel: '搜索范围',
   close: '关闭',
@@ -35,13 +35,17 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const location = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
   const [searchScope, setSearchScope] = useState<PostSearchScope>('all');
   const [activeResultIndex, setActiveResultIndex] = useState(0);
   const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        return JSON.parse(localStorage.getItem('searchHistory') || '[]');
+        const storedHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+        return Array.isArray(storedHistory)
+          ? storedHistory.filter((item): item is string => typeof item === 'string').slice(0, 5)
+          : [];
       } catch {
         return [];
       }
@@ -59,14 +63,22 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     if (!query.trim()) return;
     const newHistory = [query, ...searchHistory.filter(q => q !== query)].slice(0, 5);
     setSearchHistory(newHistory);
-    localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    try {
+      localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    } catch {
+      // Search still works when browser storage is unavailable.
+    }
   };
 
   const removeHistory = (query: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const newHistory = searchHistory.filter(q => q !== query);
     setSearchHistory(newHistory);
-    localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    try {
+      localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    } catch {
+      // Keep the in-memory history usable when persistence is unavailable.
+    }
   };
 
   useEffect(() => {
@@ -113,7 +125,11 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         return;
       }
 
-      const focusableElements = [inputRef.current, closeButtonRef.current].filter(Boolean) as HTMLElement[];
+      const focusableElements = Array.from(
+        modalRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      ).filter((element) => element.getClientRects().length > 0);
       if (focusableElements.length === 0) {
         return;
       }
@@ -176,7 +192,7 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-16 sm:pt-24">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.16, ease: modalEase }} onClick={onClose} className="absolute inset-0 bg-void/55" />
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: modalEase }} className="relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" role="dialog" aria-modal="true" aria-labelledby="site-search-title" aria-describedby="site-search-desc">
+          <motion.div ref={modalRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: modalEase }} className="relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" role="dialog" aria-modal="true" aria-labelledby="site-search-title" aria-describedby="site-search-desc">
             <div className="flex items-center border-b border-zinc-100 p-4 dark:border-zinc-800">
               <Search className="mr-3 text-zinc-600 dark:text-zinc-300" size={20} />
               <input

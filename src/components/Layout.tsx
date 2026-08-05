@@ -7,6 +7,7 @@ import { siteConfig } from '@config/site.config';
 
 import { ProgressiveImage } from './ProgressiveImage';
 import { easeSmooth, routeTransition } from '@/utils/motion';
+import { useModalOverlay } from '@/hooks/useModalOverlay';
 
 const SearchModal = lazy(() => import('./SearchModal').then((m) => ({ default: m.SearchModal })));
 const BackToTop = lazy(() => import('./BackToTop').then((m) => ({ default: m.BackToTop })));
@@ -26,7 +27,9 @@ const TEXT = {
   navAbout: '\u5173\u4e8e',
   sourceCode: '\u9879\u76ee\u6e90\u7801',
   rssFeed: 'RSS \u8ba2\u9605',
-  rssHint: '\u901a\u8fc7 RSS \u8ffd\u8e2a\u6700\u65b0\u66f4\u65b0'
+  rssHint: '\u901a\u8fc7 RSS \u8ffd\u8e2a\u6700\u65b0\u66f4\u65b0',
+  visitorInfo: '\u8bbf\u5ba2\u73af\u5883',
+  visitorInfoDesc: '\u5f53\u524d\u6d4f\u89c8\u5668\u4e0e\u8bbe\u5907\u4fe1\u606f'
 };
 
 
@@ -70,6 +73,9 @@ const getVisitorInfo = () => {
 
 const VisitorInfoPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const info = getVisitorInfo();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  useModalOverlay({ isOpen: open, onClose, initialFocusRef: closeButtonRef });
+
   return (
     <AnimatePresence>
       {open && (
@@ -87,13 +93,17 @@ const VisitorInfoPanel = ({ open, onClose }: { open: boolean; onClose: () => voi
             transition={{ duration: 0.18, ease: easeSmooth }}
             className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="visitor-info-title"
+            aria-describedby="visitor-info-description"
           >
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500 dark:text-zinc-400">{TEXT.visitorInfo}</div>
-                <h3 className="mt-2 text-lg font-bold text-zinc-900 dark:text-zinc-100">{TEXT.visitorInfoDesc}</h3>
+                <h3 id="visitor-info-title" className="mt-2 text-lg font-bold text-zinc-900 dark:text-zinc-100">{TEXT.visitorInfoDesc}</h3>
               </div>
-              <button className="rounded-full border border-zinc-200 p-2 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800" onClick={onClose} aria-label="关闭">
+              <button ref={closeButtonRef} className="rounded-full border border-zinc-200 p-2 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800" onClick={onClose} aria-label="关闭">
                 <X size={16} />
               </button>
             </div>
@@ -105,7 +115,7 @@ const VisitorInfoPanel = ({ open, onClose }: { open: boolean; onClose: () => voi
                 </div>
               ))}
             </div>
-            <p className="mt-4 text-xs leading-5 text-zinc-500 dark:text-zinc-400">仅展示本地可读取的浏览器环境信息，不包含敏感隐私数据。</p>
+            <p id="visitor-info-description" className="mt-4 text-xs leading-5 text-zinc-500 dark:text-zinc-400">仅展示本地可读取的浏览器环境信息，不包含敏感隐私数据。</p>
           </motion.div>
         </motion.div>
       )}
@@ -983,9 +993,11 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
         <div className="flex w-full flex-col items-center justify-between border-t border-zinc-200/50 pt-8 text-center text-xs font-medium text-zinc-700 dark:border-zinc-800/50 dark:text-zinc-300 md:flex-row md:text-left">
           <p>{siteConfig.footerText} · {siteConfig.author.name}</p>
           <div className="mt-4 flex flex-col items-center gap-3 md:mt-0 md:flex-row md:gap-6">
-            <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
-              {siteConfig.beian.text}
-            </a>
+            {siteConfig.beian.text && siteConfig.beian.url && (
+              <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
+                {siteConfig.beian.text}
+              </a>
+            )}
             {siteConfig.gonganBeian.enabled && (
               <a
                 href={siteConfig.gonganBeian.url}
@@ -1043,6 +1055,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) =
   const location = useLocation();
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+  const closeVisitorInfo = useCallback(() => setVisitorInfoOpen(false), []);
   const scrollTimerRef = useRef<number | null>(null);
   const routeContentKey = location.pathname;
   const isPostPage = location.pathname.startsWith('/post/');
@@ -1116,7 +1129,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, hasViewTransition }) =
         <BackToTop />
       </Suspense>
       <Footer isPostPage={isPostPage} onOpenVisitorInfo={() => setVisitorInfoOpen(true)} />
-      <VisitorInfoPanel open={visitorInfoOpen} onClose={() => setVisitorInfoOpen(false)} />
+      <VisitorInfoPanel open={visitorInfoOpen} onClose={closeVisitorInfo} />
     </div>
   );
 };

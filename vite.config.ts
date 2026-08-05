@@ -4,43 +4,6 @@ import path from 'path';
 
 const appBase = process.env.VITE_BASE_PATH?.trim() || '/';
 
-const SKIP_MODULE_PRELOAD_PATTERNS = [
-  /(?:^|\/)assets\/(?:mermaid|katex|markdown|syntax|dompurify)-/,
-  /(?:^|\/)assets\/Post-/,
-  /(?:^|\/)assets\/CoverGenerator-/,
-];
-
-const LARGE_VENDOR_LIBS: Array<[string, string]> = [
-  ['@remix-run/router', 'router-core'],
-  ['decode-named-character-reference', 'markdown'],
-  ['character-entities', 'markdown'],
-  ['property-information', 'markdown'],
-  ['hast-util', 'markdown'],
-  ['mdast-util', 'markdown'],
-  ['micromark', 'markdown'],
-  ['remark-', 'markdown'],
-  ['rehype-', 'markdown'],
-  ['unified', 'markdown'],
-  ['bail', 'markdown'],
-  ['trough', 'markdown'],
-  ['unist-', 'markdown'],
-  ['vfile', 'markdown'],
-  ['comma-separated-tokens', 'markdown'],
-  ['space-separated-tokens', 'markdown'],
-  ['web-namespaces', 'markdown']
-];
-
-
-const resolveVendorChunk = (id: string) => {
-  for (const [pattern, chunkName] of LARGE_VENDOR_LIBS) {
-    if (id.includes(pattern)) {
-      return chunkName;
-    }
-  }
-
-  return 'vendor';
-};
-
 export default defineConfig({
   plugins: [react()],
   base: appBase,
@@ -79,31 +42,12 @@ export default defineConfig({
             if (id.includes('framer-motion')) {
               return 'animation';
             }
-            if (id.includes('react-markdown') || id.includes('remark-') || id.includes('rehype-')) {
-              return 'markdown';
-            }
-            if (id.includes('highlight.js')) {
-              return 'syntax';
-            }
-            if (id.includes('katex')) {
-              return 'katex';
-            }
-            if (id.includes('mermaid')) {
-              return 'mermaid';
-            }
-            if (id.includes('lucide-react')) {
-              return 'icons';
-            }
-            if (id.includes('dompurify')) {
-              return 'dompurify';
-            }
             if (id.includes('react-helmet') || id.includes('hoist-non-react-statics')) {
               return 'react-helmet';
             }
-
-            return resolveVendorChunk(id);
           }
         },
+        onlyExplicitManualChunks: true,
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
@@ -111,16 +55,6 @@ export default defineConfig({
     },
     cssCodeSplit: true,
     chunkSizeWarningLimit: 600,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-        pure_getters: true,
-        passes: 2,
-      },
-    },
   },
   publicDir: 'public',
 });

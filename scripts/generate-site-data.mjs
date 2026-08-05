@@ -71,6 +71,17 @@ const assertValidUrl = (value, label, allowedProtocols = HTTP_URL_PROTOCOLS) => 
   }
 };
 
+const assertValidAssetUrl = (value, label) => {
+  if (value.startsWith('/') && !value.startsWith('//')) {
+    if (/[\s"'<>]/.test(value)) {
+      throw new Error(`${label} contains invalid characters: ${value}`);
+    }
+    return;
+  }
+
+  assertValidUrl(value, label);
+};
+
 const isSafeRssUrl = (value) => {
   if (!value || /[\s"'<>]/.test(value)) {
     return false;
@@ -399,7 +410,7 @@ const friends = friendFiles.flatMap((filename) => {
     const friendUrl = data.url.trim();
     const friendAvatar = data.avatar.trim();
     assertValidUrl(friendUrl, `friend ${filename} url`);
-    assertValidUrl(friendAvatar, `friend ${filename} avatar`);
+    assertValidAssetUrl(friendAvatar, `friend ${filename} avatar`);
 
     if (seenFriendUrls.has(friendUrl)) {
       logger.warn('Skip duplicate friend file', `${filename}: url ${friendUrl}`);
