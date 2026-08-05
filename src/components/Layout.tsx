@@ -221,10 +221,13 @@ export const MOBILE_NAV_ANIMATION_DURATION_MS = 340;
 export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
   const [mobileNavPhase, setMobileNavPhase] = useState<MobileNavPhase>('closed');
   const [isMobileNavMounted, setIsMobileNavMounted] = useState(false);
+  const [isNavbarHidden, setIsNavbarHidden] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
   const animationFrameRef = useRef<number | null>(null);
+  const navbarScrollFrameRef = useRef<number | null>(null);
+  const previousScrollYRef = useRef(0);
   const transitionTimerRef = useRef<number | null>(null);
   const afterCloseActionRef = useRef<(() => void) | null>(null);
   const mobileNavPanelRef = useRef<HTMLElement | null>(null);
@@ -459,6 +462,39 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
   }, [requestCloseMobileNav]);
 
   useEffect(() => {
+    previousScrollYRef.current = window.scrollY;
+
+    const handleScroll = () => {
+      if (navbarScrollFrameRef.current !== null) {
+        return;
+      }
+
+      navbarScrollFrameRef.current = window.requestAnimationFrame(() => {
+        navbarScrollFrameRef.current = null;
+        const currentScrollY = window.scrollY;
+        const previousScrollY = previousScrollYRef.current;
+
+        if (currentScrollY <= 24 || currentScrollY < previousScrollY - 8) {
+          setIsNavbarHidden(false);
+        } else if (currentScrollY > previousScrollY + 8) {
+          setIsNavbarHidden(true);
+        }
+
+        previousScrollYRef.current = currentScrollY;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (navbarScrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(navbarScrollFrameRef.current);
+        navbarScrollFrameRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isMobileNavMounted) {
       return;
     }
@@ -534,7 +570,7 @@ export const Navbar = ({ onSearchClick }: { onSearchClick: () => void }) => {
 
   return (
     <>
-      <nav className="fixed left-0 right-0 top-0 z-50 bg-white/90 dark:bg-zinc-950/90 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-all duration-500">
+      <nav className={`fixed left-0 right-0 top-0 z-50 border-b border-zinc-200/80 bg-white/90 transition-transform duration-300 dark:border-zinc-800/80 dark:bg-zinc-950/90 motion-reduce:transition-none ${isNavbarHidden ? '-translate-y-full' : 'translate-y-0'}`}>
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: easeSmooth }} className="mx-auto flex h-14 max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-6 md:h-20">
           <Link to="/" onMouseEnter={() => preloadPage('/')} className="group z-50 flex items-center space-x-2.5 sm:space-x-3">
             <div className="relative">
@@ -1000,10 +1036,14 @@ const Footer = ({ isPostPage = false, onOpenVisitorInfo }: { isPostPage?: boolea
         <div className="flex w-full flex-col items-center justify-between border-t border-zinc-200/50 pt-8 text-center text-xs font-medium text-zinc-700 dark:border-zinc-800/50 dark:text-zinc-300 md:flex-row md:text-left">
           <p>{siteConfig.footerText} · {siteConfig.author.name}</p>
           <div className="mt-4 flex flex-col items-center gap-3 md:mt-0 md:flex-row md:gap-6">
-            {siteConfig.beian.text && siteConfig.beian.url && (
-              <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
-                {siteConfig.beian.text}
-              </a>
+            {siteConfig.beian.text && (
+              siteConfig.beian.url ? (
+                <a href={siteConfig.beian.url} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">
+                  {siteConfig.beian.text}
+                </a>
+              ) : (
+                <span>{siteConfig.beian.text}</span>
+              )
             )}
             {siteConfig.gonganBeian.enabled && (
               <a

@@ -6,6 +6,7 @@
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -188,6 +189,10 @@ html.theme-switching *:not(script):not(style)::after {
 .prose :not(pre) > code {
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.prose pre {
+  scroll-margin-top: 6rem;
 }
 
 .prose table {

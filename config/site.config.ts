@@ -35,7 +35,7 @@ export const siteConfig = {
   },
   beian: {
     text: '鲁ICP备2026043420号',
-    url: '',
+    url: 'https://beian.miit.gov.cn/',
   },
   gonganBeian: {
     enabled: false,

@@ -232,10 +232,10 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
       </button>
 
       {/* Code block with optional collapse */}
-      <div className="relative flex">
+      <div className="relative flex min-w-0">
         <div
           aria-hidden="true"
-          className="hidden select-none flex-col items-end gap-0 rounded-l-lg bg-black/20 py-3 pl-3 pr-2 pt-10 text-right font-mono text-xs leading-6 text-zinc-500 sm:flex md:py-6 md:pt-7"
+          className="hidden shrink-0 select-none flex-col items-end gap-0 rounded-l-lg bg-black/20 py-3 pl-3 pr-2 pt-10 text-right font-mono text-xs leading-6 text-zinc-500 sm:flex md:py-6 md:pt-7"
           style={needsExpand && !isExpanded ? { maxHeight: '32rem', overflow: 'hidden' } : undefined}
         >
           {Array.from({ length: lineCount }, (_, i) => (
@@ -245,7 +245,7 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
         <pre
           ref={preRef}
           {...props}
-          className={`${props.className || ''} !my-0 flex-1 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-600 touch-pan-x !p-3 !pt-10 leading-6 md:!p-6 md:!pt-7 sm:rounded-l-none`}
+          className={`${props.className || ''} min-w-0 flex-1 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-600 touch-pan-x !my-0 !p-3 !pt-10 leading-6 md:!p-6 md:!pt-7 sm:rounded-l-none`}
           style={needsExpand && !isExpanded ? { maxHeight: '32rem' } : undefined}
         >
           {childrenWithProps}
