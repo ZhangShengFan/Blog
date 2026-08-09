@@ -157,17 +157,35 @@ const AppRoutes: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [showLoadingScreen, setShowLoadingScreen] = useState(() => {
+  const shouldShowLoadingScreen = () => {
     if (typeof window === 'undefined') {
       return false;
     }
-    // 每次访问都显示启动动画
-    return true;
-  });
+
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      return false;
+    }
+
+    try {
+      return window.sessionStorage.getItem('dblog-loading-seen') !== '1';
+    } catch {
+      return true;
+    }
+  };
+
+  const [showLoadingScreen, setShowLoadingScreen] = useState(shouldShowLoadingScreen);
 
   const [showCookieNotice, setShowCookieNotice] = useState(false);
 
   useEffect(() => {
+    if (showLoadingScreen) {
+      try {
+        window.sessionStorage.setItem('dblog-loading-seen', '1');
+      } catch {
+        // Ignore storage restrictions and keep the startup animation usable.
+      }
+    }
+
     if (!showLoadingScreen) {
       const timer = window.setTimeout(() => {
         setShowCookieNotice(true);
