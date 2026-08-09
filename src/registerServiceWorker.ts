@@ -1,27 +1,31 @@
 export const registerServiceWorker = () => {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+  if (import.meta.env.DEV || typeof window === 'undefined' || !('serviceWorker' in navigator)) {
     return;
   }
 
-  const cleanupLegacyServiceWorker = async () => {
-    try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map((registration) => registration.unregister()));
-    } catch {
-      // ignore
-    }
-
-    if ('caches' in window) {
-      try {
-        const keys = await caches.keys();
-        await Promise.all(keys.filter((key) => key.startsWith('zsfan-blog-v')).map((key) => caches.delete(key)));
-      } catch {
-        // ignore
-      }
-    }
-  };
-
   window.addEventListener('load', () => {
-    void cleanupLegacyServiceWorker();
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshing = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || refreshing) {
+        return;
+      }
+
+      refreshing = true;
+      window.location.reload();
+    });
+
+    void navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then((registration) => {
+        void registration.update();
+
+        if (registration.waiting && hadController) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      })
+      .catch((error) => {
+        console.warn('Service worker registration failed:', error);
+      });
   });
 };
