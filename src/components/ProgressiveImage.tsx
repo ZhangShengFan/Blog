@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { RefreshCw } from 'lucide-react';
 
 interface ProgressiveImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   wrapperClassName?: string;
@@ -29,11 +30,13 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = React.memo(({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // 优化：当 src 变化时重置状态并同步图片状态
   useEffect(() => {
     setIsLoaded(false);
     setHasError(false);
+    setRetryCount(0);
 
     const image = imgRef.current;
     if (!image || !src) {
@@ -83,11 +86,27 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = React.memo(({
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-500 dark:border-zinc-700 dark:border-t-zinc-400" />
       </div>
       {hasError ? (
-        <div className="relative flex min-h-[6rem] items-center justify-center rounded-inherit border border-dashed border-zinc-200 bg-zinc-100/90 px-4 py-6 text-center text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400">
+        <div className="relative flex min-h-[6rem] flex-col items-center justify-center gap-2 rounded-[inherit] border border-dashed border-zinc-200 bg-zinc-100/90 px-4 py-6 text-center text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400">
           <span className="line-clamp-2">图片暂时无法加载{alt ? `：${alt}` : ''}</span>
+          <button
+            type="button"
+            aria-label="重新加载图片"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:border-zinc-500 hover:text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-white"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setHasError(false);
+              setIsLoaded(false);
+              setRetryCount((count) => count + 1);
+            }}
+          >
+            <RefreshCw size={13} />
+            重试
+          </button>
         </div>
       ) : (
         <img
+          key={`${src}-${retryCount}`}
           {...props}
           ref={imgRef}
           src={src}

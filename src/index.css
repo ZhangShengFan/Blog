@@ -193,6 +193,16 @@ html.theme-switching *:not(script):not(style)::after {
 
 .prose pre {
   scroll-margin-top: 6rem;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose pre code.hljs {
+  overflow-x: visible;
+  padding: 0;
+  background: transparent;
+  color: #c9d1d9;
 }
 
 .prose table {

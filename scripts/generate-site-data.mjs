@@ -174,6 +174,7 @@ const generateSiteStats = (postsWithSearch) => {
     .slice(0, 5)
     .map(toPostSummary);
   const topImageCountPosts = postsWithSearch
+    .filter((post) => (post.imageCount || 0) > 0)
     .slice()
     .sort((a, b) => (b.imageCount || 0) - (a.imageCount || 0))
     .slice(0, 5)

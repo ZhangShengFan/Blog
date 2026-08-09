@@ -270,9 +270,9 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                           )}
                         </div>
                         <h4 className="text-lg font-semibold text-ink transition-colors group-hover:text-zinc-700 dark:text-gray-100 dark:group-hover:text-zinc-300">
-                          {post.title}
+                          {renderHighlightedText(post.title, post.searchMatch?.terms || [])}
                         </h4>
-                        <p className="mt-1 line-clamp-1 text-sm text-zinc-600 dark:text-zinc-300">{post.excerpt}</p>
+                        <p className="mt-1 line-clamp-1 text-sm text-zinc-600 dark:text-zinc-300">{renderHighlightedText(post.excerpt, post.searchMatch?.terms || [])}</p>
                         {post.searchMatch && (
                           <p className="mt-2 line-clamp-2 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs leading-5 text-zinc-700 dark:bg-amber-400/10 dark:text-zinc-200">
                             {renderHighlightedText(post.searchMatch.snippet, post.searchMatch.terms)}

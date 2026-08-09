@@ -6,6 +6,7 @@
   "scripts": {
     "gen:data": "node scripts/generate-site-data.mjs",
     "check:content": "node scripts/check-content.mjs",
+    "check:links": "node scripts/check-links.mjs",
     "prerender": "node scripts/prerender.mjs",
     "typecheck": "tsc -p config/tsconfig.json --noEmit",
     "check": "npm run gen:data && npm run check:content && npm run typecheck",
