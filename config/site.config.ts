@@ -45,7 +45,7 @@ export const siteConfig = {
   analytics: {
     umamiScriptSrc: 'https://cloud.umami.is/script.js',
     umamiWebsiteId: 'a94473a1-ffcb-421b-8ebc-70eb7c821ee6',
-    umamiShareUrl: 'https://cloud.umami.is/share/a94473a1-ffcb-421b-8ebc-70eb7c821ee6/blog.zsfan.top',
+    umamiShareUrl: 'https://cloud.umami.is/share/PKnrZe2OGN4oWsNg',
     statusPageUrl: 'https://stats.uptimerobot.com/1rpnrElw7r',
   },
 };
