@@ -38,8 +38,8 @@ export const siteConfig = {
     url: 'https://beian.miit.gov.cn/',
   },
   gonganBeian: {
-    enabled: false,
-    text: '鲁公网安备XXXXXXXXXXXXX号',
+    enabled: true,
+    text: '鲁公网安备37152502000328号',
     url: 'https://www.beian.gov.cn/portal/registerSystemInfo',
   },
   analytics: {
