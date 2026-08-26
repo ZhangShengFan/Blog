@@ -14,9 +14,9 @@ export const siteConfig = {
   runtimeLabel: '小站已苟活',
   url: 'https://blog.zsfan.top',
   social: {
-    github: 'https://github.com/ZhangShengFan/',
-    email: 'mailto:zsfan-nb@hotmail.com',
-    rawEmail: 'zsfan-nb@hotmail.com',
+    github: 'https://github.com/ZhangSheng/',
+    email: 'mailto:zsfan@hotmail.com',
+    rawEmail: 'zsfan@hotmail.com',
   },
   author: {
     name: 'ZSFan',
@@ -28,8 +28,8 @@ export const siteConfig = {
     collapseInactiveRootBranches: true,
   },
   friendsPage: {
-    repoUrl: 'https://github.com/ZhangShengFan/Blog',
-    repoFriendsUrl: 'https://github.com/ZhangShengFan/Blog/tree/main/friends',
+    repoUrl: 'https://github.com/ZhangSheng/Blog',
+    repoFriendsUrl: 'https://github.com/ZhangSheng/Blog/tree/main/friends',
     repoFriendsDir: 'friends',
     announcement: '博客已重置完成，新的内容将从这里重新开始。',
   },
