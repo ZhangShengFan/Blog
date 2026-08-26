@@ -34,11 +34,11 @@ export const siteConfig = {
     announcement: '博客已重置完成，新的内容将从这里重新开始。',
   },
   beian: {
-    text: '鲁ICP备2026043420号',
+    text: '',
     url: 'https://beian.miit.gov.cn/',
   },
   gonganBeian: {
-    enabled: true,
+    enabled: false,
     text: '鲁公网安备37152502000328号',
     url: 'https://www.beian.gov.cn/portal/registerSystemInfo',
   },
