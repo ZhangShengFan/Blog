@@ -1,18 +1,17 @@
 {
-  "name": "ZSFan 的博客 | ZSFan",
+  "name": "我的博客",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "sync:content": "node scripts/sync-content.mjs",
     "gen:data": "node scripts/generate-site-data.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:links": "node scripts/check-links.mjs",
     "prerender": "node scripts/prerender.mjs",
     "typecheck": "tsc -p config/tsconfig.json --noEmit",
     "check": "npm run gen:data && npm run check:content && npm run typecheck",
-    "dev": "npm run sync:content && npm run gen:data && vite",
-    "build": "npm run sync:content && npm run check && vite build && npm run prerender",
+    "dev": "npm run gen:data && vite",
+    "build": "npm run check && vite build && npm run prerender",
     "preview": "vite preview"
   },
   "dependencies": {
