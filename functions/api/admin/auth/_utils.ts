@@ -4,6 +4,7 @@ export interface Env {
 
 const PASSWORD_KEY = 'admin:password:v1';
 const TOKEN_KEY = 'admin:token:v1';
+const REPO_KEY = 'admin:repo:v1';
 const SESSION_PREFIX = 'admin:session:';
 const SESSION_COOKIE = 'admin_session';
 const SESSION_TTL = 60 * 60 * 24 * 30;
@@ -24,6 +25,18 @@ export async function getToken(env: Env) {
 
 export async function setToken(env: Env, token: string) {
   await env.KV.put(TOKEN_KEY, token);
+}
+
+export async function getRepo(env: Env) {
+  return env.KV.get(REPO_KEY);
+}
+
+export async function setRepo(env: Env, repo: string) {
+  await env.KV.put(REPO_KEY, repo);
+}
+
+export function isValidRepo(repo: string) {
+  return /^[\w.-]+\/[\w.-]+$/.test(repo);
 }
 
 export function json(data: unknown, status = 200, headers: Record<string, string> = {}) {

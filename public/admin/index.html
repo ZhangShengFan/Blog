@@ -210,6 +210,11 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
       <input type="password" id="token-input" placeholder="ghp_xxx 或 github_pat_xxx" autocomplete="off">
       <span id="token-help" style="font-size:11px;color:var(--muted);margin-top:2px">GitHub Token 将保存在云端 KV；已保存后换设备登录无需再次输入，留空表示继续使用当前 Token</span>
     </div>
+    <div class="field">
+      <label>GitHub 仓库</label>
+      <input type="text" id="repo-input" placeholder="yourname/your-blog" autocomplete="off">
+      <span id="repo-help" style="font-size:11px;color:var(--muted);margin-top:2px">格式为 用户名/仓库名，后台会通过该仓库读写文章与配置；留空表示继续使用当前仓库</span>
+    </div>
     <button class="btn btn-primary" onclick="handleAuthSubmit()" id="login-submit-btn">登录</button>
     <p class="error-msg" id="login-error">密码错误，请重试</p>
   </div>
@@ -551,7 +556,7 @@ async function sha256(str) {
 // ── 登录 ──────────────────────────────────────────
 let authMode = 'login';
 let sessionAuthenticated = false;
-let authStatus = { initialized: false, authenticated: false, hasToken: false };
+let authStatus = { initialized: false, authenticated: false, hasToken: false, repo: '' };
 
 function updateTokenHint() {
   const hint = document.getElementById('token-help');
@@ -563,6 +568,18 @@ function updateTokenHint() {
   hint.textContent = authStatus.hasToken
     ? '当前 GitHub Token 已保存到云端，留空即可继续使用；输入新 Token 可覆盖旧值。'
     : '当前还没有保存 GitHub Token，请输入一次并保存到云端。';
+}
+
+function updateRepoHint() {
+  const hint = document.getElementById('repo-help');
+  if (!hint) return;
+  if (authMode === 'setup') {
+    hint.textContent = '首次初始化必须设置 GitHub 仓库（格式: 用户名/仓库名），后台会读写该仓库的内容。';
+    return;
+  }
+  hint.textContent = authStatus.repo
+    ? `当前仓库为 ${authStatus.repo}，留空即可继续使用；输入新值可切换到其他仓库。`
+    : '当前还没有设置 GitHub 仓库，请输入一次并保存。';
 }
 
 
@@ -578,11 +595,12 @@ function setAuthMode(mode) {
 
   if (mode === 'setup') {
     if (title) title.textContent = '首次设置后台密码';
-    if (desc) desc.textContent = '首次进入后台，请先设置登录密码，并保存一个 GitHub Token 到云端。';
+    if (desc) desc.textContent = '首次进入后台，请先设置登录密码，并保存 GitHub Token 与仓库到云端。';
     if (passwordField) passwordField.style.display = 'block';
     if (confirmField) confirmField.style.display = 'block';
     if (submitBtn) submitBtn.textContent = '设置密码并进入后台';
     updateTokenHint();
+    updateRepoHint();
     return;
   }
 
@@ -593,24 +611,28 @@ function setAuthMode(mode) {
     if (confirmField) confirmField.style.display = 'none';
     if (submitBtn) submitBtn.textContent = '进入后台';
     updateTokenHint();
+    updateRepoHint();
     return;
   }
 
   if (title) title.textContent = 'Blog Admin';
-  if (desc) desc.textContent = '输入后台密码进入管理后台；如需更新 GitHub Token，可在下方输入新值。';
+  if (desc) desc.textContent = '输入后台密码进入管理后台；如需更新 GitHub Token 或切换仓库，可在下方输入新值。';
   if (passwordField) passwordField.style.display = 'block';
   if (confirmField) confirmField.style.display = 'none';
   if (submitBtn) submitBtn.textContent = '登录';
   updateTokenHint();
+  updateRepoHint();
 }
 
-function setAuthInputs(password = '', token = '') {
+function setAuthInputs(password = '', token = '', repo = '') {
   const passwordInput = document.getElementById('password-input');
   const confirmInput = document.getElementById('password-confirm-input');
   const tokenInput = document.getElementById('token-input');
+  const repoInput = document.getElementById('repo-input');
   if (passwordInput) passwordInput.value = password;
   if (confirmInput) confirmInput.value = '';
   if (tokenInput) tokenInput.value = token || '';
+  if (repoInput) repoInput.value = repo || '';
 }
 
 async function fetchAuthStatus() {
@@ -626,9 +648,10 @@ async function restoreLogin() {
       initialized: !!status.initialized,
       authenticated: !!status.authenticated,
       hasToken: !!status.hasToken,
+      repo: status.repo || '',
     };
     sessionAuthenticated = authStatus.authenticated;
-    setAuthInputs('', '');
+    setAuthInputs('', '', '');
 
     if (!authStatus.initialized) {
       setAuthMode('setup');
@@ -639,6 +662,7 @@ async function restoreLogin() {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
       updateTokenHint();
+      updateRepoHint();
       loadData();
       return;
     }
@@ -654,12 +678,20 @@ async function handleAuthSubmit() {
   const pwd = document.getElementById('password-input').value;
   const confirmPwd = document.getElementById('password-confirm-input')?.value || '';
   const token = document.getElementById('token-input').value.trim();
+  const repo = document.getElementById('repo-input').value.trim();
   const error = document.getElementById('login-error');
   const hasInputToken = !!token;
   const hasStoredToken = !!authStatus.hasToken;
+  const hasInputRepo = !!repo;
+  const hasStoredRepo = !!authStatus.repo;
 
   if (hasInputToken && !(token.startsWith('ghp_') || token.startsWith('github_pat_'))) {
     showToast('请输入有效的 GitHub Token', 'error');
+    return;
+  }
+
+  if (hasInputRepo && !/^[\w.-]+\/[\w.-]+$/.test(repo)) {
+    showToast('仓库格式不正确，如 yourname/your-blog', 'error');
     return;
   }
 
@@ -681,8 +713,20 @@ async function handleAuthSubmit() {
     return;
   }
 
+  if (authMode === 'setup' && !hasInputRepo) {
+    error.textContent = '首次初始化必须设置 GitHub 仓库，如 yourname/your-blog';
+    error.style.display = 'block';
+    return;
+  }
+
   if (authMode !== 'setup' && !hasStoredToken && !hasInputToken) {
     error.textContent = '当前还没有保存 GitHub Token，请先输入一次';
+    error.style.display = 'block';
+    return;
+  }
+
+  if (authMode !== 'setup' && !hasStoredRepo && !hasInputRepo) {
+    error.textContent = '当前还没有设置 GitHub 仓库，请先输入一次';
     error.style.display = 'block';
     return;
   }
@@ -690,6 +734,7 @@ async function handleAuthSubmit() {
   const endpoint = authMode === 'setup' ? '/api/admin/auth/setup' : '/api/admin/auth/login';
   const payload = { password: pwd };
   if (hasInputToken) payload.token = token;
+  if (hasInputRepo) payload.repo = repo;
 
   const res = await fetch(endpoint, {
     method: 'POST',
@@ -709,12 +754,14 @@ async function handleAuthSubmit() {
     initialized: true,
     authenticated: true,
     hasToken: hasStoredToken || hasInputToken,
+    repo: hasInputRepo ? repo : authStatus.repo,
   };
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   error.style.display = 'none';
-  setAuthInputs('', '');
+  setAuthInputs('', '', '');
   updateTokenHint();
+  updateRepoHint();
   loadData();
 }
 

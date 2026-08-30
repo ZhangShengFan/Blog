@@ -1,4 +1,4 @@
-import { Env, createSession, getPasswordHash, json, sessionCookie, sha256, setToken } from './_utils';
+import { Env, createSession, getPasswordHash, isValidRepo, json, sessionCookie, sha256, setRepo, setToken } from './_utils';
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const existing = await getPasswordHash(env);
@@ -6,10 +6,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const body = await request.json<any>().catch(() => null);
   const password = typeof body?.password === 'string' ? body.password : '';
   const token = typeof body?.token === 'string' ? body.token : '';
+  const repo = typeof body?.repo === 'string' ? body.repo.trim() : '';
   if (!password) return json({ ok: false, error: '请输入密码' }, 400);
   if ((await sha256(password)) !== existing) return json({ ok: false, error: '密码错误，请重试' }, 401);
   if (token && (token.startsWith('ghp_') || token.startsWith('github_pat_'))) {
     await setToken(env, token);
+  }
+  if (repo) {
+    if (!isValidRepo(repo)) {
+      return json({ ok: false, error: '仓库格式不正确，如 yourname/your-blog' }, 400);
+    }
+    await setRepo(env, repo);
   }
   const sessionToken = await createSession(env);
   return json({ ok: true, authenticated: true }, 200, { 'Set-Cookie': sessionCookie(sessionToken) });
