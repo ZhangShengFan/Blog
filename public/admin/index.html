@@ -396,6 +396,23 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
     </div>
     <div class="editor-layout">
       <div class="editor-main">
+        <div class="sidebar-card" id="init-site-card" style="display:none;border:1px solid #e5484d55;background:rgba(229,72,77,0.06);">
+          <div class="sidebar-card-title" style="color:#e5484d;">初始化为新站点（Fork 后使用）</div>
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">该操作会清空现有文章 / 友链，且不可撤销，仅能执行一次。适用于 Fork 本项目后，想丢弃原作者的示例内容、从零开始写自己的博客。</p>
+          <div class="toggle-row">
+            <span>清空所有文章</span>
+            <label class="toggle"><input type="checkbox" id="init-clear-posts" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <span>清空所有友链</span>
+            <label class="toggle"><input type="checkbox" id="init-clear-friends" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-group" style="margin-top:8px;">
+            <label class="form-label">输入 INIT 以确认执行</label>
+            <input class="form-input" id="init-confirm-input" placeholder="INIT">
+          </div>
+          <button class="btn btn-sm" onclick="initSite()" style="background:#e5484d;color:#fff;border:none;margin-top:4px;">初始化为我的博客</button>
+        </div>
         <div class="sidebar-card">
           <div class="sidebar-card-title">基础信息</div>
           <div class="form-group"><label class="form-label">博客名称</label><input class="form-input" id="s-title" placeholder="ZSFan 的博客"></div>
@@ -556,7 +573,7 @@ async function sha256(str) {
 // ── 登录 ──────────────────────────────────────────
 let authMode = 'login';
 let sessionAuthenticated = false;
-let authStatus = { initialized: false, authenticated: false, hasToken: false, repo: '' };
+let authStatus = { initialized: false, authenticated: false, hasToken: false, repo: '', initDone: false };
 
 function updateTokenHint() {
   const hint = document.getElementById('token-help');
@@ -641,6 +658,11 @@ async function fetchAuthStatus() {
   return res.json();
 }
 
+function updateInitCardVisibility() {
+  const card = document.getElementById('init-site-card');
+  if (card) card.style.display = authStatus.initDone ? 'none' : 'block';
+}
+
 async function restoreLogin() {
   try {
     const status = await fetchAuthStatus();
@@ -649,6 +671,7 @@ async function restoreLogin() {
       authenticated: !!status.authenticated,
       hasToken: !!status.hasToken,
       repo: status.repo || '',
+      initDone: !!status.initDone,
     };
     sessionAuthenticated = authStatus.authenticated;
     setAuthInputs('', '', '');
@@ -663,6 +686,7 @@ async function restoreLogin() {
       document.getElementById('app').style.display = 'flex';
       updateTokenHint();
       updateRepoHint();
+      updateInitCardVisibility();
       loadData();
       return;
     }
@@ -755,6 +779,7 @@ async function handleAuthSubmit() {
     authenticated: true,
     hasToken: hasStoredToken || hasInputToken,
     repo: hasInputRepo ? repo : authStatus.repo,
+    initDone: !!authStatus.initDone,
   };
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
@@ -762,6 +787,7 @@ async function handleAuthSubmit() {
   setAuthInputs('', '', '');
   updateTokenHint();
   updateRepoHint();
+  updateInitCardVisibility();
   loadData();
 }
 
@@ -1411,6 +1437,68 @@ export const siteConfig = {
     await loadData();
   } catch(e) {
     showToast('保存失败：' + e.message, 'error');
+  }
+  showLoading(false);
+}
+
+
+async function initSite() {
+  if (authStatus.initDone) {
+    showToast('该站点已完成初始化，不能重复执行', 'error');
+    return;
+  }
+  const confirmInput = document.getElementById('init-confirm-input');
+  if (!confirmInput || confirmInput.value.trim() !== 'INIT') {
+    showToast('请在确认框中输入 INIT 后再执行', 'error');
+    return;
+  }
+  const clearPosts = document.getElementById('init-clear-posts').checked;
+  const clearFriends = document.getElementById('init-clear-friends').checked;
+  if (!clearPosts && !clearFriends) {
+    showToast('请至少选择一项要清空的内容', 'error');
+    return;
+  }
+  if (!confirm('此操作会删除所选内容且不可撤销，确定要初始化为新站点吗？')) return;
+
+  showLoading(true);
+  try {
+    if (clearPosts) {
+      for (const p of posts) {
+        if (p.name === '.gitkeep') continue;
+        await ghAPI(`contents/${p.path}`, 'DELETE', {
+          message: `chore: init - remove post "${p.name}"`,
+          sha: p.sha,
+          branch: BRANCH,
+        });
+      }
+    }
+    if (clearFriends) {
+      for (const fr of friends) {
+        if (fr.name === '.gitkeep') continue;
+        await ghAPI(`contents/${fr.path}`, 'DELETE', {
+          message: `chore: init - remove friend "${fr.name}"`,
+          sha: fr.sha,
+          branch: BRANCH,
+        });
+      }
+    }
+
+    const res = await fetch('/api/admin/init', {
+      method: 'POST',
+      credentials: 'same-origin',
+    });
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok || !result.ok) {
+      throw new Error(result.error || '标记初始化状态失败');
+    }
+
+    authStatus.initDone = true;
+    updateInitCardVisibility();
+    confirmInput.value = '';
+    showToast('✓ 初始化完成，站点已清空，可以开始写自己的内容了', 'success');
+    await loadData();
+  } catch (e) {
+    showToast('初始化失败：' + e.message, 'error');
   }
   showLoading(false);
 }

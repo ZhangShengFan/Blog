@@ -5,6 +5,7 @@ export interface Env {
 const PASSWORD_KEY = 'admin:password:v1';
 const TOKEN_KEY = 'admin:token:v1';
 const REPO_KEY = 'admin:repo:v1';
+const INIT_DONE_KEY = 'admin:init_done:v1';
 const SESSION_PREFIX = 'admin:session:';
 const SESSION_COOKIE = 'admin_session';
 const SESSION_TTL = 60 * 60 * 24 * 30;
@@ -37,6 +38,14 @@ export async function setRepo(env: Env, repo: string) {
 
 export function isValidRepo(repo: string) {
   return /^[\w.-]+\/[\w.-]+$/.test(repo);
+}
+
+export async function isInitDone(env: Env) {
+  return !!(await env.KV.get(INIT_DONE_KEY));
+}
+
+export async function markInitDone(env: Env) {
+  await env.KV.put(INIT_DONE_KEY, '1');
 }
 
 export function json(data: unknown, status = 200, headers: Record<string, string> = {}) {
