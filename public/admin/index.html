@@ -398,7 +398,7 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
       <div class="editor-main">
         <div class="sidebar-card" id="init-site-card" style="display:none;border:1px solid #e5484d55;background:rgba(229,72,77,0.06);">
           <div class="sidebar-card-title" style="color:#e5484d;">初始化为新站点（Fork 后使用）</div>
-          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">该操作会清空现有文章 / 友链，且不可撤销，仅能执行一次。适用于 Fork 本项目后，想丢弃原作者的示例内容、从零开始写自己的博客。</p>
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">本站的文章、友链、站点配置都保存在你自己仓库的 <code>zsfan</code> 分支上，与放代码的 <code>main</code> 分支完全独立。该操作只清空你自己仓库 <code>zsfan</code> 分支里的内容，不影响 <code>main</code> 分支代码，也不会影响任何其他 fork 出去的仓库；且不可撤销，仅能执行一次。</p>
           <div class="toggle-row">
             <span>清空所有文章</span>
             <label class="toggle"><input type="checkbox" id="init-clear-posts" checked><span class="toggle-slider"></span></label>
@@ -494,8 +494,7 @@ button:focus,button:focus-visible,button:focus-within,button:active,button::-moz
 
 <script>
 // ── 配置 ──────────────────────────────────────────
-const REPO = 'ZhangShengFan/Blog';
-const BRANCH = 'main';
+const BRANCH = 'zsfan'; // 内容分支：文章/友链/站点配置都存在这个分支，与放代码的 main 分支彻底分开
 // 密码哈希（SHA-256 of "@ZSFan1224"）
 const PWD_HASH = 'a8b3f2e1d4c5b6a7e8f9d0c1b2a3f4e5d6c7b8a9e0f1d2c3b4a5f6e7d8c9b0a1';
 
@@ -658,6 +657,22 @@ async function fetchAuthStatus() {
   return res.json();
 }
 
+
+async function ensureContentBranch() {
+  try {
+    const res = await fetch('/api/admin/ensure-content-branch', {
+      method: 'POST',
+      credentials: 'same-origin',
+    });
+    const result = await res.json().catch(() => ({}));
+    if (result.created) {
+      showToast('已为当前仓库创建 zsfan 内容分支（复制自 main 分支现有内容）', 'success');
+    }
+  } catch (e) {
+    console.warn('ensureContentBranch failed:', e);
+  }
+}
+
 function updateInitCardVisibility() {
   const card = document.getElementById('init-site-card');
   if (card) card.style.display = authStatus.initDone ? 'none' : 'block';
@@ -687,6 +702,7 @@ async function restoreLogin() {
       updateTokenHint();
       updateRepoHint();
       updateInitCardVisibility();
+      await ensureContentBranch();
       loadData();
       return;
     }
@@ -788,6 +804,7 @@ async function handleAuthSubmit() {
   updateTokenHint();
   updateRepoHint();
   updateInitCardVisibility();
+  await ensureContentBranch();
   loadData();
 }
 
@@ -1458,7 +1475,7 @@ async function initSite() {
     showToast('请至少选择一项要清空的内容', 'error');
     return;
   }
-  if (!confirm('此操作会删除所选内容且不可撤销，确定要初始化为新站点吗？')) return;
+  if (!confirm('此操作会删除你自己仓库 zsfan 内容分支里的所选内容，且不可撤销（不会影响 main 分支代码，也不会影响其他 fork 出去的仓库），确定要初始化为新站点吗？')) return;
 
   showLoading(true);
   try {
@@ -1495,7 +1512,7 @@ async function initSite() {
     authStatus.initDone = true;
     updateInitCardVisibility();
     confirmInput.value = '';
-    showToast('✓ 初始化完成，站点已清空，可以开始写自己的内容了', 'success');
+    showToast('✓ 初始化完成，你自己仓库的内容已清空，不影响 main 分支代码，也不影响其他人的仓库', 'success');
     await loadData();
   } catch (e) {
     showToast('初始化失败：' + e.message, 'error');
